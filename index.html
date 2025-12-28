@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Backoffice Gestion Hospitalière</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Page de Login -->
+  <div id="loginPage">
+    <h2>Connexion</h2>
+    <input type="text" id="username" placeholder="Nom d'utilisateur">
+    <input type="password" id="password" placeholder="Mot de passe">
+    <button onclick="login()">Se connecter</button>
+  </div>
+
+  <!-- Navbar horizontale -->
+  <nav class="topnav" style="display:none;">
+    <h1> MyHospital Manager</h1>
+    <ul>
+      <li><button onclick="showSection('patients')">Patients</button></li>
+      <li><button onclick="showSection('medecins')">Médecins</button></li>
+      <li><button onclick="showSection('rendezvous')">Rendez-vous</button></li>
+      <li><button onclick="showSection('prescriptions')">Prescriptions</button></li>
+      <li><button onclick="showSection('services')">Services</button></li>
+      <li><button onclick="showSection('dashboard')">Dashboard</button></li>
+    </ul>
+  </nav>
+
+  <!-- Contenu principal -->
+  <main style="display:none;">
+    <section id="patients" class="crud-section"></section>
+    <section id="medecins" class="crud-section"></section>
+    <section id="rendezvous" class="crud-section"></section>
+    <section id="prescriptions" class="crud-section"></section>
+    <section id="services" class="crud-section"></section>
+
+    <!-- Dashboard -->
+    <section id="dashboard" class="crud-section">
+      <h2>📊 Tableau de Bord</h2>
+      <canvas id="chartPatients"></canvas>
+      <canvas id="chartRendezvous"></canvas>
+    </section>
+  </main>
+
+  <!-- Librairies -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
