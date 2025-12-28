@@ -2,50 +2,94 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Backoffice Gestion Hospitalière</title>
+  <title>Gestion de Bibliothèque</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Page de Login -->
-  <div id="loginPage">
-    <h2>Connexion</h2>
-    <input type="text" id="username" placeholder="Nom d'utilisateur">
-    <input type="password" id="password" placeholder="Mot de passe">
-    <button onclick="login()">Se connecter</button>
-  </div>
 
-  <!-- Navbar horizontale -->
-  <nav class="topnav" style="display:none;">
-    <h1> MyHospital Manager</h1>
-    <ul>
-      <li><button onclick="showSection('patients')">Patients</button></li>
-      <li><button onclick="showSection('medecins')">Médecins</button></li>
-      <li><button onclick="showSection('rendezvous')">Rendez-vous</button></li>
-      <li><button onclick="showSection('prescriptions')">Prescriptions</button></li>
-      <li><button onclick="showSection('services')">Services</button></li>
-      <li><button onclick="showSection('dashboard')">Dashboard</button></li>
-    </ul>
-  </nav>
+<!-- ===== LOGIN ===== -->
+<div id="login-page" class="centered">
+  <h2>Connexion</h2>
+  <form id="login-form">
+    <input id="username" type="text" placeholder="Utilisateur" required>
+    <input id="password" type="password" placeholder="Mot de passe" required>
+    <button type="submit">Se connecter</button>
+    <p id="login-error" class="error"></p>
+  </form>
+</div>
 
-  <!-- Contenu principal -->
-  <main style="display:none;">
-    <section id="patients" class="crud-section"></section>
-    <section id="medecins" class="crud-section"></section>
-    <section id="rendezvous" class="crud-section"></section>
-    <section id="prescriptions" class="crud-section"></section>
-    <section id="services" class="crud-section"></section>
+<!-- ===== APPLICATION ===== -->
+<div id="app" class="hidden">
 
-    <!-- Dashboard -->
-    <section id="dashboard" class="crud-section">
-      <h2>📊 Tableau de Bord</h2>
-      <canvas id="chartPatients"></canvas>
-      <canvas id="chartRendezvous"></canvas>
+  <header class="top-bar">
+    <h1>📚 Gestion de Bibliothèque</h1>
+    <nav>
+      <a href="#" onclick="showSection('dashboard')">🏠 Home</a>
+      <a href="#" onclick="showSection('livres')">Livres</a>
+      <a href="#" onclick="showSection('auteurs')">Auteurs</a>
+      <a href="#" onclick="showSection('adherents')">Adhérents</a>
+      <a href="#" onclick="showSection('emprunts')">Emprunts</a>
+      <a href="#" onclick="showSection('categories')">Catégories</a>
+      <a href="#" class="logout" onclick="logout()">Déconnexion</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- DASHBOARD -->
+    <section id="dashboard">
+      <h2>Dashboard</h2>
+      <div id="stats">
+        <p>📘 Livres <span id="count-livres">0</span></p>
+        <p>✍️ Auteurs <span id="count-auteurs">0</span></p>
+        <p>👤 Adhérents <span id="count-adherents">0</span></p>
+        <p>🔁 Emprunts <span id="count-emprunts">0</span></p>
+        <p>🏷 Catégories <span id="count-categories">0</span></p>
+      </div>
+    </section>
+
+    <!-- SECTIONS CRUD -->
+    <section id="livres" class="entity-section">
+      <h2>Livres</h2>
+      <button onclick="showForm('livres')">➕ Ajouter</button>
+      <div id="livres-list"></div>
+    </section>
+
+    <section id="auteurs" class="entity-section">
+      <h2>Auteurs</h2>
+      <button onclick="showForm('auteurs')">➕ Ajouter</button>
+      <div id="auteurs-list"></div>
+    </section>
+
+    <section id="adherents" class="entity-section">
+      <h2>Adhérents</h2>
+      <button onclick="showForm('adherents')">➕ Ajouter</button>
+      <div id="adherents-list"></div>
+    </section>
+
+    <section id="emprunts" class="entity-section">
+      <h2>Emprunts</h2>
+      <button onclick="showForm('emprunts')">➕ Ajouter</button>
+      <div id="emprunts-list"></div>
+    </section>
+
+    <section id="categories" class="entity-section">
+      <h2>Catégories</h2>
+      <button onclick="showForm('categories')">➕ Ajouter</button>
+      <div id="categories-list"></div>
     </section>
   </main>
+</div>
 
-  <!-- Librairies -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="script.js"></script>
+<!-- ===== FORM POPUP ===== -->
+<div id="form-popup" class="hidden popup">
+  <form id="entity-form">
+    <h3 id="form-title"></h3>
+    <div id="form-fields"></div>
+    <button type="submit">💾 Enregistrer</button>
+    <button type="button" onclick="closeForm()">❌ Annuler</button>
+  </form>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
