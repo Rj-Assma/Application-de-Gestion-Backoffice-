@@ -1,97 +1,210 @@
-/* Reset */
-* { margin:0; padding:0; box-sizing:border-box; }
-
-/* Global */
-body {
-  font-family: 'Segoe UI', sans-serif;
-  background: #f4f6f9;
-  color: #333;
+/* ================== GLOBAL ================== */
+* {
+  box-sizing: border-box;
 }
 
-/* Login */
-#loginPage {
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  margin-top:100px;
-}
-#loginPage input {
-  margin:5px;
-  padding:10px;
-  border:1px solid #ccc;
-  border-radius:6px;
-}
-#loginPage button {
-  padding:10px 15px;
-  background:#00c4cc;
-  color:#fff;
-  border:none;
-  border-radius:6px;
-  cursor:pointer;
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #f5f5f5;
+  background-image: url('https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=1470&q=80');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
 }
 
-/* Navbar horizontale */
-.topnav {
-  width:100%;
-  background:#1e2a38;
-  color:#fff;
-  padding:10px 20px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
+/* Overlay sombre */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 0;
 }
-.topnav h1 { font-size:20px; color:#00c4cc; }
-.topnav ul { list-style:none; display:flex; gap:15px; }
-.topnav button {
-  padding:10px 15px;
-  background:#2c3e50;
-  color:#fff;
-  border:none;
-  border-radius:6px;
-  cursor:pointer;
+
+#login-page, #app {
+  position: relative;
+  z-index: 1;
 }
-.topnav button:hover { background:#00c4cc; }
 
-/* Main */
-main { padding:25px; }
+/* ================== LOGIN ================== */
+.centered {
+  max-width: 360px;
+  margin: 120px auto;
+  padding: 35px;
+  background: rgba(218, 206, 200, 0.96);
+  border-radius: 16px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+  text-align: center;
+  color: #2c3e50;
+}
 
-/* Buttons */
-button.add { background:#00c4cc; color:#fff; }
-button.export { background:#3498db; color:#fff; }
-button.delete { background:#e74c3c; color:#fff; }
-button.edit { background:#f39c12; color:#fff; }
+.centered h2 {
+  margin-bottom: 20px;
+}
 
-/* Tables */
+#login-page input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: 1px solid #0f0909;
+}
+
+#login-page button {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #d4d7bf, #ac9e5c);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+#login-page button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+
+.error {
+  color: red;
+  font-size: 0.9rem;
+}
+
+/* ================== HEADER ================== */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 30px;
+  background: rgba(185, 162, 150, 0.96);
+  margin-bottom: 30px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.35);
+}
+
+.top-bar h1 {
+  margin: 0;
+  font-size: 26px;
+  color: #2c3e50;
+  white-space: nowrap;
+}
+
+.top-bar nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.top-bar nav a {
+  text-decoration: none;
+  padding: 9px 16px;
+  border-radius: 10px;
+  color: #2c3e50;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.top-bar nav a:hover {
+  background: #3498db;
+  color: white;
+}
+
+.top-bar nav .logout {
+  background: #2a382d;
+  color: white;
+}
+
+.top-bar nav .logout:hover {
+  background: #c0392b;
+}
+
+/* ================== MAIN ================== */
+main {
+  padding: 20px;
+}
+
+/* ================== DASHBOARD ================== */
+#stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+#stats p {
+  flex: 1 1 180px;
+  background: linear-gradient(135deg, #1abc9c, #16a085);
+  color: white;
+  padding: 20px;
+  border-radius: 15px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+/* ================== TABLES ================== */
 table {
-  width:100%;
-  border-collapse:collapse;
-  margin-top:15px;
-  background:#fff;
-  border-radius:8px;
-  box-shadow:0 2px 6px rgba(0,0,0,0.1);
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background: rgba(255,255,255,0.97);
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+  color: #2c3e50;
 }
+
+th, td {
+  padding: 14px 16px;
+  text-align: left;
+}
+
 th {
-  background:#00c4cc;
-  color:#fff;
-  padding:12px;
-}
-td { padding:10px; border-bottom:1px solid #eee; }
-tr:hover { background:#f9f9f9; }
-
-/* Search */
-input[type="text"] {
-  padding:8px;
-  margin:10px 0;
-  border:1px solid #ccc;
-  border-radius:6px;
-  width:250px;
+  background: linear-gradient(135deg, #2980b9, #3498db);
+  color: white;
 }
 
-/* Dashboard */
-canvas {
-  margin:20px 0;
-  background:#fff;
-  padding:15px;
-  border-radius:8px;
-  box-shadow:0 2px 6px rgba(0,0,0,0.1);
+tr:not(:last-child) td {
+  border-bottom: 1px solid #eee;
+}
+
+tr:hover {
+  background: rgba(52, 152, 219, 0.08);
+}
+
+/* ================== BUTTONS ================== */
+button {
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button.edit {
+  background: #f39c12;
+  color: white;
+}
+
+button.edit:hover {
+  background: #e67e22;
+}
+
+button.delete {
+  background: #e74c3c;
+  color: white;
+}
+
+button.delete:hover {
+  background: #c0392b;
+}
+
+/* ================== UTILS ================== */
+.hidden {
+  display: none;
 }
