@@ -29,7 +29,7 @@ body::before {
   z-index: 1;
 }
 
-/*  LOGIN  */
+/* ================== LOGIN ================== */
 .centered {
   max-width: 360px;
   margin: 120px auto;
@@ -40,6 +40,41 @@ body::before {
   text-align: center;
   color: #2c3e50;
 }
+
+.centered h2 {
+  margin-bottom: 20px;
+}
+
+#login-page input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: 1px solid #0f0909;
+}
+
+#login-page button {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #d4d7bf, #ac9e5c);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+#login-page button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+
+.error {
+  color: red;
+  font-size: 0.9rem;
+}
+
 
 /*  SIDEBAR   */
 .sidebar {
