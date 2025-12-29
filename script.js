@@ -46,18 +46,48 @@ function initStorage(){
   keys.forEach(renderList);
 }
 
-/* ===== NAV ===== */
+/* ===== NAV & SIDEBAR ===== */
+
+function toggleSidebar() {
+    const sidebar = document.getElementById("mySidebar");
+    const isOpen = sidebar.style.width === "250px";
+    sidebar.style.width = isOpen ? "0" : "250px";
+}
+
 function showSection(id){
-  document.querySelectorAll("section").forEach(s=>s.style.display="none");
-  document.getElementById(id).style.display="block";
-  updateDashboard();
+    document.querySelectorAll("section").forEach(s=>s.style.display="none");
+    document.getElementById(id).style.display="block";
+    
+   
+    const sidebar = document.getElementById("mySidebar");
+    if(sidebar) sidebar.style.width = "0";
+    
+    updateDashboard();
+}
+
+/* ===== SEARCH FUNCTION ===== */
+
+function filterTable() {
+    const filter = document.getElementById("search-input").value.toLowerCase();
+
+    const activeSection = document.querySelector('section:not([style*="display: none"])');
+    if (!activeSection) return;
+
+    const rows = activeSection.querySelectorAll("table tr");
+    rows.forEach((row, index) => {
+        if (index === 0) return; 
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(filter) ? "" : "none";
+    });
 }
 
 /* ===== DASHBOARD ===== */
 function updateDashboard(){
   keys.forEach(k=>{
-    document.getElementById("count-"+k).textContent =
-      JSON.parse(localStorage.getItem(k)).length;
+    const countEl = document.getElementById("count-"+k);
+    if(countEl) {
+        countEl.textContent = JSON.parse(localStorage.getItem(k)).length;
+    }
   });
 }
 
@@ -77,8 +107,12 @@ function showForm(entity,i=null){
   formPopup.classList.remove("hidden");
   formFields.innerHTML="";
   formTitle.textContent=i===null?"Ajouter":"Modifier";
+  
+  const data = i !== null ? JSON.parse(localStorage.getItem(entity))[i] : {};
+
   fields[entity].forEach(f=>{
-    formFields.innerHTML+=`<input name="${f}" placeholder="${f}" required>`;
+    const val = data[f] || "";
+    formFields.innerHTML+=`<input name="${f}" value="${val}" placeholder="${f}" required style="display:block; width:100%; margin-bottom:10px; padding:8px;">`;
   });
 }
 
@@ -97,19 +131,24 @@ entityForm.onsubmit=e=>{
 function renderList(entity){
   const arr=JSON.parse(localStorage.getItem(entity));
   const div=document.getElementById(entity+"-list");
-  if(!arr.length){div.innerHTML="Aucun élément"; return;}
+  if(!div) return;
+  if(!arr.length){div.innerHTML="<p style='color:white;'>Aucun élément</p>"; return;}
+  
   let html="<table><tr>"+Object.keys(arr[0]).map(k=>`<th>${k}</th>`).join("")+"<th>Actions</th></tr>";
   arr.forEach((o,i)=>{
     html+="<tr>"+Object.values(o).map(v=>`<td>${v}</td>`).join("")+
-    `<td><button onclick="showForm('${entity}',${i})">✏</button>
-    <button onclick="del('${entity}',${i})">🗑</button></td></tr>`;
+    `<td><button onclick="showForm('${entity}',${i})" style="background:#f39c12; color:white; border:none; padding:5px; cursor:pointer;">✏</button>
+    <button onclick="del('${entity}',${i})" style="background:#e74c3c; color:white; border:none; padding:5px; cursor:pointer;">🗑</button></td></tr>`;
   });
   div.innerHTML=html+"</table>";
 }
 
 function del(e,i){
-  const a=JSON.parse(localStorage.getItem(e));
-  a.splice(i,1);
-  localStorage.setItem(e,JSON.stringify(a));
-  renderList(e);
+  if(confirm("Voulez-vous vraiment supprimer cet élément ?")){
+      const a=JSON.parse(localStorage.getItem(e));
+      a.splice(i,1);
+      localStorage.setItem(e,JSON.stringify(a));
+      renderList(e);
+      updateDashboard();
+  }
 }
