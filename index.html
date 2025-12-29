@@ -1,95 +1,71 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Gestion de Bibliothèque</title>
-  <link rel="stylesheet" href="style.css">
-</head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ma Bibliothèque</title>
+    <link rel="stylesheet" href="style.css"> </head>
 <body>
 
-<!-- ===== LOGIN ===== -->
-<div id="login-page" class="centered">
-  <h2>Connexion</h2>
-  <form id="login-form">
-    <input id="username" type="text" placeholder="Utilisateur" required>
-    <input id="password" type="password" placeholder="Mot de passe" required>
-    <button type="submit">Se connecter</button>
-    <p id="login-error" class="error"></p>
-  </form>
-</div>
+    <div id="login-page">
+        <div class="centered">
+            <h2>Connexion</h2>
+            <form id="login-form">
+                <input id="username" type="text" placeholder="Utilisateur" required>
+                <input id="password" type="password" placeholder="Mot de passe" required>
+                <button type="submit">Se connecter</button>
+                <p id="login-error" class="error"></p>
+            </form>
+        </div>
+    </div>
 
-<!-- ===== APPLICATION ===== -->
-<div id="app" class="hidden">
+    <div id="app" class="hidden">
+        
+        <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
 
-  <header class="top-bar">
-    <h1>📚 Gestion de Bibliothèque</h1>
-    <nav>
-      <a href="#" onclick="showSection('dashboard')">🏠 Home</a>
-      <a href="#" onclick="showSection('livres')">Livres</a>
-      <a href="#" onclick="showSection('auteurs')">Auteurs</a>
-      <a href="#" onclick="showSection('adherents')">Adhérents</a>
-      <a href="#" onclick="showSection('emprunts')">Emprunts</a>
-      <a href="#" onclick="showSection('categories')">Catégories</a>
-      <a href="#" class="logout" onclick="logout()">Déconnexion</a>
-    </nav>
-  </header>
+        <div id="mySidebar" class="sidebar">
+            <a href="javascript:void(0)" class="closebtn" onclick="toggleSidebar()">×</a>
+            <h2 style="padding-left: 20px; color: #3498db;">Bibliothèque</h2>
+            <a href="#" onclick="showSection('dashboard')"> Dashboard</a>
+            <a href="#" onclick="showSection('livres')"> Livres</a>
+            <a href="#" onclick="showSection('auteurs')"> Auteurs</a>
+            <a href="#" onclick="showSection('adherents')"> Adhérents</a>
+            <a href="#" onclick="showSection('emprunts')"> Emprunts</a>
+            <a href="#" class="logout" onclick="logout()"> Déconnexion</a>
+        </div>
 
-  <main>
-    <!-- DASHBOARD -->
-    <section id="dashboard">
-      <h2>Dashboard</h2>
-      <div id="stats">
-        <p>📘 Livres <span id="count-livres">0</span></p>
-        <p>✍️ Auteurs <span id="count-auteurs">0</span></p>
-        <p>👤 Adhérents <span id="count-adherents">0</span></p>
-        <p>🔁 Emprunts <span id="count-emprunts">0</span></p>
-        <p>🏷 Catégories <span id="count-categories">0</span></p>
-      </div>
-    </section>
+        <main id="main-content">
+            <div style="margin-top: 60px; margin-bottom: 20px;">
+                <input type="text" id="search-input" onkeyup="filterTable()" placeholder="🔍 Rechercher dans la bibliothèque..." 
+                       style="width: 100%; padding: 12px; border-radius: 8px; border: none; color: #333;">
+            </div>
 
-    <!-- SECTIONS CRUD -->
-    <section id="livres" class="entity-section">
-      <h2>Livres</h2>
-      <button onclick="showForm('livres')">➕ Ajouter</button>
-      <div id="livres-list"></div>
-    </section>
+            <section id="dashboard">
+                <h2>Tableau de Bord</h2>
+                <div id="stats">
+                    <p>📘 Livres <span id="count-livres">0</span></p>
+                    <p>✍️ Auteurs <span id="count-auteurs">0</span></p>
+                    <p>👤 Adhérents <span id="count-adherents">0</span></p>
+                </div>
+            </section>
 
-    <section id="auteurs" class="entity-section">
-      <h2>Auteurs</h2>
-      <button onclick="showForm('auteurs')">➕ Ajouter</button>
-      <div id="auteurs-list"></div>
-    </section>
+            <section id="livres" style="display:none;">
+                <h2>Liste des Livres</h2>
+                <button onclick="showForm('livres')" style="background:#2ecc71; margin-bottom: 15px;">+ Ajouter</button>
+                <div id="livres-list"></div>
+            </section>
 
-    <section id="adherents" class="entity-section">
-      <h2>Adhérents</h2>
-      <button onclick="showForm('adherents')">➕ Ajouter</button>
-      <div id="adherents-list"></div>
-    </section>
+            </main>
+    </div>
 
-    <section id="emprunts" class="entity-section">
-      <h2>Emprunts</h2>
-      <button onclick="showForm('emprunts')">➕ Ajouter</button>
-      <div id="emprunts-list"></div>
-    </section>
+    <div id="form-popup" class="hidden centered" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2000;">
+        <h3 id="form-title"></h3>
+        <form id="entity-form">
+            <div id="form-fields"></div>
+            <button type="submit" style="margin-top:10px;">Enregistrer</button>
+            <button type="button" onclick="closeForm()" style="background:#95a5a6; margin-top:5px;">Annuler</button>
+        </form>
+    </div>
 
-    <section id="categories" class="entity-section">
-      <h2>Catégories</h2>
-      <button onclick="showForm('categories')">➕ Ajouter</button>
-      <div id="categories-list"></div>
-    </section>
-  </main>
-</div>
-
-<!-- ===== FORM POPUP ===== -->
-<div id="form-popup" class="hidden popup">
-  <form id="entity-form">
-    <h3 id="form-title"></h3>
-    <div id="form-fields"></div>
-    <button type="submit">💾 Enregistrer</button>
-    <button type="button" onclick="closeForm()">❌ Annuler</button>
-  </form>
-</div>
-
-<script src="script.js"></script>
-</body>
+    <script src="script.js"></script> </body>
 </html>
