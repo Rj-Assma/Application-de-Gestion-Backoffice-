@@ -1,71 +1,171 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ma Bibliothèque</title>
-    <link rel="stylesheet" href="style.css"> </head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MyManager - Backoffice Bibliothèque</title>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
 <body>
 
-    <div id="login-page">
-        <div class="centered">
-            <h2>Connexion</h2>
-            <form id="login-form">
-                <input id="username" type="text" placeholder="Utilisateur" required>
-                <input id="password" type="password" placeholder="Mot de passe" required>
-                <button type="submit">Se connecter</button>
-                <p id="login-error" class="error"></p>
-            </form>
+  <!-- LOGIN PAGE -->
+  <div id="login-page">
+    <div class="centered">
+      <h2>Connexion</h2>
+      <form id="login-form">
+        <input id="username" type="text" placeholder="Utilisateur" required />
+        <input id="password" type="password" placeholder="Mot de passe" required />
+        <button type="submit">Se connecter</button>
+        <p id="login-error" class="error"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- APP -->
+  <div id="app" class="hidden">
+
+    <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
+
+    <div id="mySidebar" class="sidebar">
+      <a href="javascript:void(0)" class="closebtn" onclick="toggleSidebar()">×</a>
+      <h2 style="padding-left: 20px; color: #251f17;">Bibliothèque</h2>
+      <a href="#" onclick="showSection('dashboard')"> Dashboard</a>
+      <a href="#" onclick="showSection('livres')"> Livres</a>
+      <a href="#" onclick="showSection('auteurs')"> Auteurs</a>
+      <a href="#" onclick="showSection('adherents')"> Adhérents</a>
+      <a href="#" onclick="showSection('emprunts')"> Emprunts</a>
+      <a href="#" onclick="showSection('categories')"> Catégories</a>
+      <a href="#" class="logout" onclick="logout()"> Déconnexion</a>
+    </div>
+
+    <header class="topbar">
+      <div class="top-left">
+        <img src="" alt="" class="logo" />
+      </div>
+      <div class="top-right">
+        <label for="lang" class="sr-only">Langue</label>
+        <select id="lang" onchange="setLang(this.value)">
+          <option value="fr">Français</option>
+          <option value="en">English</option>
+          <option value="ar">العربية</option>
+        </select>
+      </div>
+    </header>
+
+    <main id="main-content">
+      <div style="margin-top: 60px; margin-bottom: 20px;">
+        <input type="text" id="search-input" onkeyup="filterTable()" placeholder="🔍 Rechercher dans la bibliothèque..." />
+      </div>
+
+      <!-- DASHBOARD -->
+      <section id="dashboard">
+        <h2 id="title-dashboard">Tableau de Bord</h2>
+        <div id="stats">
+          <p>📘 Livres <span id="count-livres">0</span></p>
+          <p>✍️ Auteurs <span id="count-auteurs">0</span></p>
+          <p>👤 Adhérents <span id="count-adherents">0</span></p>
+          <p>📑 Catégories <span id="count-categories">0</span></p>
+          <p>📕 Emprunts <span id="count-emprunts">0</span></p>
         </div>
-    </div>
 
-    <div id="app" class="hidden">
-        
-        <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
-
-        <div id="mySidebar" class="sidebar">
-            <a href="javascript:void(0)" class="closebtn" onclick="toggleSidebar()">×</a>
-            <h2 style="padding-left: 20px; color: #3498db;">Bibliothèque</h2>
-            <a href="#" onclick="showSection('dashboard')"> Dashboard</a>
-            <a href="#" onclick="showSection('livres')"> Livres</a>
-            <a href="#" onclick="showSection('auteurs')"> Auteurs</a>
-            <a href="#" onclick="showSection('adherents')"> Adhérents</a>
-            <a href="#" onclick="showSection('emprunts')"> Emprunts</a>
-            <a href="#" class="logout" onclick="logout()"> Déconnexion</a>
+        <div class="charts-grid">
+          <div class="chart-card">
+            <h4>Livres par catégorie</h4>
+            <canvas id="chartLivres"></canvas>
+          </div>
+          <div class="chart-card">
+            <h4>Auteurs (répartition)</h4>
+            <canvas id="chartAuteurs"></canvas>
+          </div>
+          <div class="chart-card">
+            <h4>Adhérents (inscriptions par mois)</h4>
+            <canvas id="chartAdherents"></canvas>
+          </div>
+          <div class="chart-card">
+            <h4>Emprunts (par mois)</h4>
+            <canvas id="chartEmprunts"></canvas>
+          </div>
+          <div class="chart-card">
+            <h4>Catégories (part)</h4>
+            <canvas id="chartCategories"></canvas>
+          </div>
         </div>
+      </section>
 
-        <main id="main-content">
-            <div style="margin-top: 60px; margin-bottom: 20px;">
-                <input type="text" id="search-input" onkeyup="filterTable()" placeholder="🔍 Rechercher dans la bibliothèque..." 
-                       style="width: 100%; padding: 12px; border-radius: 8px; border: none; color: #333;">
-            </div>
+      <!-- LIVRES -->
+      <section id="livres" style="display:none;">
+        <h2 id="title-livres">Liste des Livres</h2>
+        <div class="section-actions">
+          <button onclick="showForm('livres')" class="btn-add">+ Ajouter</button>
+          <button onclick="exportCSV('livres')" class="btn-export">Exporter CSV</button>
+          <button onclick="exportPDF('livres')" class="btn-export">Exporter PDF</button>
+        </div>
+        <div id="livres-list"></div>
+      </section>
 
-            <section id="dashboard">
-                <h2>Tableau de Bord</h2>
-                <div id="stats">
-                    <p>📘 Livres <span id="count-livres">0</span></p>
-                    <p>✍️ Auteurs <span id="count-auteurs">0</span></p>
-                    <p>👤 Adhérents <span id="count-adherents">0</span></p>
-                </div>
-            </section>
+      <!-- AUTEURS -->
+      <section id="auteurs" style="display:none;">
+        <h2 id="title-auteurs">Liste des Auteurs</h2>
+        <div class="section-actions">
+          <button onclick="showForm('auteurs')" class="btn-add">+ Ajouter</button>
+          <button onclick="exportCSV('auteurs')" class="btn-export">Exporter CSV</button>
+          <button onclick="exportPDF('auteurs')" class="btn-export">Exporter PDF</button>
+        </div>
+        <div id="auteurs-list"></div>
+      </section>
 
-            <section id="livres" style="display:none;">
-                <h2>Liste des Livres</h2>
-                <button onclick="showForm('livres')" style="background:#2ecc71; margin-bottom: 15px;">+ Ajouter</button>
-                <div id="livres-list"></div>
-            </section>
+      <!-- ADHERENTS -->
+      <section id="adherents" style="display:none;">
+        <h2 id="title-adherents">Liste des Adhérents</h2>
+        <div class="section-actions">
+          <button onclick="showForm('adherents')" class="btn-add">+ Ajouter</button>
+          <button onclick="exportCSV('adherents')" class="btn-export">Exporter CSV</button>
+          <button onclick="exportPDF('adherents')" class="btn-export">Exporter PDF</button>
+        </div>
+        <div id="adherents-list"></div>
+      </section>
 
-            </main>
-    </div>
+      <!-- EMPRUNTS -->
+      <section id="emprunts" style="display:none;">
+        <h2 id="title-emprunts">Liste des Emprunts</h2>
+        <div class="section-actions">
+          <button onclick="showForm('emprunts')" class="btn-add">+ Ajouter</button>
+          <button onclick="exportCSV('emprunts')" class="btn-export">Exporter CSV</button>
+          <button onclick="exportPDF('emprunts')" class="btn-export">Exporter PDF</button>
+        </div>
+        <div id="emprunts-list"></div>
+      </section>
 
-    <div id="form-popup" class="hidden centered" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2000;">
-        <h3 id="form-title"></h3>
-        <form id="entity-form">
-            <div id="form-fields"></div>
-            <button type="submit" style="margin-top:10px;">Enregistrer</button>
-            <button type="button" onclick="closeForm()" style="background:#95a5a6; margin-top:5px;">Annuler</button>
-        </form>
-    </div>
+      <!-- CATEGORIES -->
+      <section id="categories" style="display:none;">
+        <h2 id="title-categories">Liste des Catégories</h2>
+        <div class="section-actions">
+          <button onclick="showForm('categories')" class="btn-add">+ Ajouter</button>
+          <button onclick="exportCSV('categories')" class="btn-export">Exporter CSV</button>
+          <button onclick="exportPDF('categories')" class="btn-export">Exporter PDF</button>
+        </div>
+        <div id="categories-list"></div>
+      </section>
 
-    <script src="script.js"></script> </body>
+    </main>
+  </div>
+
+  <!-- FORM POPUP -->
+  <div id="form-popup" class="hidden centered popup">
+    <h3 id="form-title"></h3>
+    <form id="entity-form">
+      <div id="form-fields"></div>
+      <div class="form-actions">
+        <button type="submit" class="btn-save">Enregistrer</button>
+        <button type="button" onclick="closeForm()" class="btn-cancel">Annuler</button>
+      </div>
+    </form>
+  </div>
+
+  <script src="script.js"></script>
+</body>
 </html>
