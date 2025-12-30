@@ -1,171 +1,140 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MyManager - Backoffice Bibliothèque</title>
-
-  <!-- Chart.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ma Bibliothèque</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Chart.js simple chart for dashboard -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- jsPDF pour export PDF simple --> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
-  <!-- LOGIN PAGE -->
-  <div id="login-page">
-    <div class="centered">
-      <h2>Connexion</h2>
-      <form id="login-form">
-        <input id="username" type="text" placeholder="Utilisateur" required />
-        <input id="password" type="password" placeholder="Mot de passe" required />
-        <button type="submit">Se connecter</button>
-        <p id="login-error" class="error"></p>
-      </form>
-    </div>
-  </div>
-
-  <!-- APP -->
-  <div id="app" class="hidden">
-
-    <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
-
-    <div id="mySidebar" class="sidebar">
-      <a href="javascript:void(0)" class="closebtn" onclick="toggleSidebar()">×</a>
-      <h2 style="padding-left: 20px; color: #251f17;">Bibliothèque</h2>
-      <a href="#" onclick="showSection('dashboard')"> Dashboard</a>
-      <a href="#" onclick="showSection('livres')"> Livres</a>
-      <a href="#" onclick="showSection('auteurs')"> Auteurs</a>
-      <a href="#" onclick="showSection('adherents')"> Adhérents</a>
-      <a href="#" onclick="showSection('emprunts')"> Emprunts</a>
-      <a href="#" onclick="showSection('categories')"> Catégories</a>
-      <a href="#" class="logout" onclick="logout()"> Déconnexion</a>
+    <div id="login-page">
+        <div class="centered">
+            <h2>Connexion</h2>
+            <form id="login-form">
+                <input id="username" type="text" placeholder="Utilisateur" required>
+                <input id="password" type="password" placeholder="Mot de passe" required>
+                <button type="submit">Se connecter</button>
+                <p id="login-error" class="error"></p>
+            </form>
+        </div>
     </div>
 
-    <header class="topbar">
-      <div class="top-left">
-        <img src="" alt="" class="logo" />
-      </div>
-      <div class="top-right">
-        <label for="lang" class="sr-only">Langue</label>
-        <select id="lang" onchange="setLang(this.value)">
-          <option value="fr">Français</option>
-          <option value="en">English</option>
-          <option value="ar">العربية</option>
-        </select>
-      </div>
-    </header>
+    <div id="app" class="hidden">
+        
+        <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
 
-    <main id="main-content">
-      <div style="margin-top: 60px; margin-bottom: 20px;">
-        <input type="text" id="search-input" onkeyup="filterTable()" placeholder="🔍 Rechercher dans la bibliothèque..." />
-      </div>
-
-      <!-- DASHBOARD -->
-      <section id="dashboard">
-        <h2 id="title-dashboard">Tableau de Bord</h2>
-        <div id="stats">
-          <p>📘 Livres <span id="count-livres">0</span></p>
-          <p>✍️ Auteurs <span id="count-auteurs">0</span></p>
-          <p>👤 Adhérents <span id="count-adherents">0</span></p>
-          <p>📑 Catégories <span id="count-categories">0</span></p>
-          <p>📕 Emprunts <span id="count-emprunts">0</span></p>
+        <div id="mySidebar" class="sidebar">
+            <a href="javascript:void(0)" class="closebtn" onclick="toggleSidebar()">×</a>
+            <h2 style="padding-left: 20px; color: #251f17;">Bibliothèque</h2>
+            <a href="#" onclick="showSection('dashboard')"> Dashboard</a>
+            <a href="#" onclick="showSection('livres')"> Livres</a>
+            <a href="#" onclick="showSection('auteurs')"> Auteurs</a>
+            <a href="#" onclick="showSection('adherents')"> Adhérents</a>
+            <a href="#" onclick="showSection('emprunts')"> Emprunts</a>
+            <a href="#" onclick="showSection('categories')"> Catégories</a>
+            <a href="#" class="logout" onclick="logout()"> Déconnexion</a>
         </div>
+        
+        <header class="topbar" style="position: fixed; top: 12px; right: 20px; z-index:1002;"> <select id="lang" onchange="changeLanguage()"> 
+            <option value="fr">🇫🇷 Français</option>
+            <option value="en">🇬🇧 English</option>
+            <option value="ar">🇸🇦 العربية</option>
+        </select> </header>
+        
+        <main id="main-content">
+            <div style=" margin-left:1000px;">
+                <input type="text" id="search-input" onkeyup="filterTable()" placeholder="🔍 Rechercher ..." 
+                       style="width: 100%; padding: 10px; border-radius: 8px; border: none; color: #333;">
+            </div>
 
-        <div class="charts-grid">
-          <div class="chart-card">
-            <h4>Livres par catégorie</h4>
-            <canvas id="chartLivres"></canvas>
-          </div>
-          <div class="chart-card">
-            <h4>Auteurs (répartition)</h4>
-            <canvas id="chartAuteurs"></canvas>
-          </div>
-          <div class="chart-card">
-            <h4>Adhérents (inscriptions par mois)</h4>
-            <canvas id="chartAdherents"></canvas>
-          </div>
-          <div class="chart-card">
-            <h4>Emprunts (par mois)</h4>
-            <canvas id="chartEmprunts"></canvas>
-          </div>
-          <div class="chart-card">
-            <h4>Catégories (part)</h4>
-            <canvas id="chartCategories"></canvas>
-          </div>
-        </div>
-      </section>
+            <section id="dashboard">
+                <h1>Tableau de Bord</h1>
+                <div id="stats">
+                    <p>📘 Livres <span id="count-livres">0</span></p>
+                    <p>✍️ Auteurs <span id="count-auteurs">0</span></p>
+                    <p>👤 Adhérents <span id="count-adherents">0</span></p>
+                    <p>📚 Emprunts <span id="count-emprunts">0</span></p>
+                    <p>🏷️ Catégories <span id="count-categories">0</span></p>
+                </div>
+                <div class="charts-grid" style="margin-top:18px;">
+                    <div class="chart-card" style="height:240px;">
+                        <h4 style="color:#2c3e50;">Livres par catégorie</h4> <canvas id="chartLivres"></canvas>
+                    </div>
+                    <div class="chart-card" style="height:240px;">
+                        <h4 style="color:#2c3e50;">Répartition des auteurs</h4> <canvas id="chartAuteurs"></canvas>
+                    </div>
+                    <div class="chart-card" style="height:240px;">
+                        <h4 style="color:#2c3e50;">Inscriptions adhérents (6 mois)</h4> <canvas id="chartAdherents"></canvas>
+                    </div>
+                    <div class="chart-card" style="height:240px;">
+                        <h4 style="color:#2c3e50;">Emprunts (6 mois)</h4> <canvas id="chartEmprunts"></canvas>
+                    </div>
+                    <div class="chart-card" style="height:240px;">
+                        <h4 style="color:#2c3e50;">Part des catégories</h4> <canvas id="chartCategories"></canvas>
+                    </div>
+                </div>
 
-      <!-- LIVRES -->
-      <section id="livres" style="display:none;">
-        <h2 id="title-livres">Liste des Livres</h2>
-        <div class="section-actions">
-          <button onclick="showForm('livres')" class="btn-add">+ Ajouter</button>
-          <button onclick="exportCSV('livres')" class="btn-export">Exporter CSV</button>
-          <button onclick="exportPDF('livres')" class="btn-export">Exporter PDF</button>
-        </div>
-        <div id="livres-list"></div>
-      </section>
+            </section>
 
-      <!-- AUTEURS -->
-      <section id="auteurs" style="display:none;">
-        <h2 id="title-auteurs">Liste des Auteurs</h2>
-        <div class="section-actions">
-          <button onclick="showForm('auteurs')" class="btn-add">+ Ajouter</button>
-          <button onclick="exportCSV('auteurs')" class="btn-export">Exporter CSV</button>
-          <button onclick="exportPDF('auteurs')" class="btn-export">Exporter PDF</button>
-        </div>
-        <div id="auteurs-list"></div>
-      </section>
+            <section id="livres" style="display:none;">
+                <h2>Liste des Livres</h2>
+                <div style="margin-bottom:12px;">
+                  <button onclick="showForm('livres')" style="background:#996346; margin-bottom: 15px; padding: 5px; border-radius: 5px;">+ Ajouter</button>
+                  <button onclick="exportCSV('livres')" style="background:#996346; margin-bottom: 15px; padding: 5px; border-radius: 5px;">Exporter CSV</button>
+                  <button onclick="exportPDF('livres')" style="background:#996346; margin-bottom: 15px; padding: 5px; border-radius: 5px;">Exporter PDF</button>
+                </div>
+                <div id="livres-list"></div>
+            </section>
 
-      <!-- ADHERENTS -->
-      <section id="adherents" style="display:none;">
-        <h2 id="title-adherents">Liste des Adhérents</h2>
-        <div class="section-actions">
-          <button onclick="showForm('adherents')" class="btn-add">+ Ajouter</button>
-          <button onclick="exportCSV('adherents')" class="btn-export">Exporter CSV</button>
-          <button onclick="exportPDF('adherents')" class="btn-export">Exporter PDF</button>
-        </div>
-        <div id="adherents-list"></div>
-      </section>
+            <section id="auteurs" style="display:none;">
+                <h2>Liste des Auteurs</h2>
+                <button onclick="showForm('auteurs')" style="background:#996346; margin-bottom: 15px; padding: 5px; border-radius: 5px;">+ Ajouter</button>
+                <button onclick="exportCSV('auteurs')" style="background:#996346; margin-bottom: 15px; padding: 5px; border-radius: 5px;">Exporter CSV</button>
+                <button onclick="exportPDF('auteurs')" style="background:#996346; margin-bottom: 15px; padding: 5px; border-radius: 5px;">Exporter PDF</button>
+                <div id="auteurs-list"></div>
+            </section>
 
-      <!-- EMPRUNTS -->
-      <section id="emprunts" style="display:none;">
-        <h2 id="title-emprunts">Liste des Emprunts</h2>
-        <div class="section-actions">
-          <button onclick="showForm('emprunts')" class="btn-add">+ Ajouter</button>
-          <button onclick="exportCSV('emprunts')" class="btn-export">Exporter CSV</button>
-          <button onclick="exportPDF('emprunts')" class="btn-export">Exporter PDF</button>
-        </div>
-        <div id="emprunts-list"></div>
-      </section>
+            <section id="adherents" style="display:none;">
+                <h2>Liste des Adhérents</h2>
+                <button onclick="showForm('adherents')" style="background:#996346; margin-bottom: 15px; padding: 5px; border-radius: 5px;">+ Ajouter</button>
+                <button onclick="exportCSV('adherents')" style="background:#996346; margin-bottom: 15px; padding: 5px; border-radius: 5px;">Exporter CSV</button>
+                <button onclick="exportPDF('adherents')" style="background:#996346; margin-bottom: 15px; padding: 5px; border-radius: 5px;">Exporter PDF</button>
+                <div id="adherents-list"></div>
+            </section>
 
-      <!-- CATEGORIES -->
-      <section id="categories" style="display:none;">
-        <h2 id="title-categories">Liste des Catégories</h2>
-        <div class="section-actions">
-          <button onclick="showForm('categories')" class="btn-add">+ Ajouter</button>
-          <button onclick="exportCSV('categories')" class="btn-export">Exporter CSV</button>
-          <button onclick="exportPDF('categories')" class="btn-export">Exporter PDF</button>
-        </div>
-        <div id="categories-list"></div>
-      </section>
+            <section id="emprunts" style="display:none;">
+                <h2>Liste des Emprunts</h2>
+                <button onclick="showForm('emprunts')" style="background:#996346; margin-bottom: 15px; padding: 5px; border-radius: 5px;">+ Ajouter</button>
+                <button onclick="exportCSV('emprunts')" style="background:#996346; margin-bottom: 15px; padding: 5px; border-radius: 5px;">Exporter CSV</button>
+                <button onclick="exportPDF('emprunts')" style="background:#996346; margin-bottom: 15px; padding: 5px; border-radius: 5px;">Exporter PDF</button>
+                <div id="emprunts-list"></div>
+            </section>
 
-    </main>
-  </div>
+            <section id="categories" style="display:none;">
+                <h2>Liste des Catégories</h2>
+                <button onclick="showForm('categories')" style="background:#996346; margin-bottom: 15px; padding: 5px; border-radius: 5px;">+ Ajouter</button>
+                <button onclick="exportCSV('categories')" style="background:#996346; margin-bottom: 15px; padding: 5px; border-radius: 5px;">Exporter CSV</button>
+                <button onclick="exportPDF('categories')" style="background:#996346; margin-bottom: 15px; padding: 5px; border-radius: 5px;">Exporter PDF</button>
+                <div id="categories-list"></div>
+            </section>
 
-  <!-- FORM POPUP -->
-  <div id="form-popup" class="hidden centered popup">
-    <h3 id="form-title"></h3>
-    <form id="entity-form">
-      <div id="form-fields"></div>
-      <div class="form-actions">
-        <button type="submit" class="btn-save">Enregistrer</button>
-        <button type="button" onclick="closeForm()" class="btn-cancel">Annuler</button>
-      </div>
-    </form>
-  </div>
+        </main>
+    </div>
 
-  <script src="script.js"></script>
+    <div id="form-popup" class="hidden centered" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2000;">
+        <h3 id="form-title"></h3>
+        <form id="entity-form">
+            <div id="form-fields"></div>
+            <button type="submit" style="background:#91bdae; margin-top:10px; padding: 5px; border-radius: 5px;">Enregistrer</button>
+            <button type="button" onclick="closeForm()" style="background:#95a5a6; margin-top:5px; padding: 5px; border-radius: 5px;">Annuler</button>
+        </form>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
