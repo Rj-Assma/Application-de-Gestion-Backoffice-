@@ -1,218 +1,298 @@
-/*  GLOBAL  */
+/* ============================================================
+   1. VARIABLES & FONT
+   ============================================================ */
+:root {
+    --pink-pastel: #FFD1DC;
+    --purple-pastel: #E1D5E7;
+    --blue-pastel: #D5E8D4; /* Soft Mint */
+    --text-dark: #5D4037;
+    --white: #ffffff;
+    --bg-soft: #FFF9FB;
+}
+
 * {
-  box-sizing: border-box;
+    box-sizing: border-box;
+    font-family: 'Quicksand', sans-serif;
 }
 
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: #f5f5f5;
-  background-image: url('https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=1470&q=80');
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-soft);
+    color: var(--text-dark);
+    overflow-x: hidden;
 }
 
-/* Overlay sombre */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  z-index: 0;
+.hidden { display: none !important; }
+
+/* ============================================================
+   2. PAGE DE CONNEXION (LOGIN)
+   ============================================================ */
+#login-page {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #fce4ec 0%, #f3e5f5 100%);
 }
 
-#login-page, #app {
-  position: relative;
-  z-index: 1;
+.login-card {
+    background: var(--white);
+    padding: 40px;
+    border-radius: 30px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    text-align: center;
+    width: 350px;
 }
 
-/* ================== LOGIN ================== */
-.centered {
-  max-width: 360px;
-  margin: 120px auto;
-  padding: 35px;
-  background: rgba(218, 206, 200, 0.96);
-  border-radius: 16px;
-  box-shadow: 0 15px 40px rgba(0,0,0,0.4);
-  text-align: center;
-  color: #2c3e50;
+.login-icon { font-size: 50px; margin-bottom: 10px; }
+
+input[type="text"], input[type="password"] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 10px 0;
+    border: 2px solid #f0f0f0;
+    border-radius: 15px;
+    outline: none;
+    transition: 0.3s;
 }
 
-.centered h2 {
-  margin-bottom: 20px;
+input:focus { border-color: var(--pink-pastel); }
+
+.btn-login {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--pink-pastel);
+    border: none;
+    border-radius: 15px;
+    color: #ad1457;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
 }
 
-#login-page input {
-  width: 100%;
-  padding: 12px;
-  margin: 10px 0;
-  border-radius: 8px;
-  border: 1px solid #0f0909;
+/* ============================================================
+   3. BARRE DE NAVIGATION (TOP NAV)
+   ============================================================ */
+.top-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background: var(--white);
+    margin: 15px 20px;
+    border-radius: 50px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+    position: sticky;
+    top: 15px;
+    z-index: 100;
 }
 
-#login-page button {
-  width: 100%;
-  padding: 12px;
-  background: #996346;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.3s;
+.menu-trigger {
+    background: var(--purple-pastel);
+    border: none;
+    padding: 8px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #6a1b9a;
 }
 
-#login-page button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+.search-bubble {
+    background: #f8f9fa;
+    border-radius: 30px;
+    padding: 5px 20px;
+    width: 350px;
+    border: 2px solid transparent;
 }
 
-.error {
-  color: red;
-  font-size: 0.9rem;
+.search-bubble:focus-within { border-color: var(--pink-pastel); background: white; }
+
+.search-bubble input {
+    border: none;
+    background: transparent;
+    outline: none;
+    width: 100%;
+    padding: 8px;
 }
 
+.lang-btn {
+    border: none;
+    background: #eee;
+    padding: 5px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 12px;
+}
 
-/*  SIDEBAR   */
+.lang-btn.active { background: var(--pink-pastel); color: #ad1457; }
+
+.logout-pill {
+    background: #ffebee;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 20px;
+    color: #c62828;
+    cursor: pointer;
+}
+
+/* ============================================================
+   4. MENU LATÉRAL (SIDEBAR)
+   ============================================================ */
 .sidebar {
-  height: 100%;
-  width: 250px;
-  position: fixed;
-  z-index: 1001;
-  top: 0;
-  left: 0;
-  background: linear-gradient(135deg, #996346, #514f4a);
-  overflow-x: hidden;
-  transition: 0.5s;
-  padding-top: 50px;
-  box-shadow: 4px 0 15px rgba(0,0,0,0.5);
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 200;
+    top: 0;
+    left: 0;
+    background-color: var(--white);
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+    box-shadow: 5px 0 15px rgba(0,0,0,0.02);
 }
 
-.sidebar a {
-  padding: 15px 25px;
-  text-decoration: none;
-  font-size: 18px;
-  color: #ecf0f1;
-  display: block;
-  transition: 0.3s;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
+.sidebar-logo {
+    padding: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #f06292;
+    text-align: center;
 }
 
-.sidebar a:hover {
-  background-color: #42372c;
-  padding-left: 35px; 
+.sidebar-links a {
+    padding: 15px 25px;
+    text-decoration: none;
+    font-size: 18px;
+    color: #777;
+    display: flex;
+    align-items: center;
+    transition: 0.3s;
+}
+
+.sidebar-links a span { margin-right: 15px; }
+
+.sidebar-links a:hover {
+    background-color: #fff5f8;
+    color: #f06292;
+    padding-left: 35px;
 }
 
 .sidebar .closebtn {
-  position: absolute;
-  top: 0;
-  right: 25px;
-  font-size: 36px;
-  border: none;
+    position: absolute;
+    top: 10px;
+    right: 25px;
+    font-size: 36px;
+    text-decoration: none;
+    color: #ccc;
 }
 
+/* ============================================================
+   5. CONTENU & TABLEAUX
+   ============================================================ */
+main { padding: 20px 40px; }
 
-.menu-btn {
-  font-size: 20px;
-  cursor: pointer;
-  background-color: #b9a296;
-  color: #2c3e50;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 8px;
-  position: fixed;
-  top: 15px;
-  left: 15px;
-  z-index: 1000;
-  font-weight: bold;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+.stats-container {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
 }
 
-/*  MAIN & SEARCH  */
-main {
-  padding: 20px;
-  margin-top: 50px;
+.stat-card {
+    flex: 1;
+    padding: 30px;
+    border-radius: 25px;
+    text-align: center;
+    color: white;
 }
 
+.stat-card.pink { background: #f48fb1; }
+.stat-card.purple { background: #ce93d8; }
+.stat-card.blue { background: #81d4fa; }
 
+.stat-card h3 { margin: 0; font-size: 18px; opacity: 0.9; }
+.stat-card p { margin: 10px 0 0; font-size: 36px; font-weight: bold; }
 
-#search-input {
-  width: 100%;
-  padding: 12px;
-  border-radius: 10px;
-  border: none;
-  background: rgba(255,255,255,0.9);
-  color: #2c3e50;
-  font-size: 16px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+.table-container {
+    background: white;
+    border-radius: 25px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.02);
+    margin-top: 20px;
 }
 
-/*  DASHBOARD  */
-#stats {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-
-#stats p {
-  flex: 1 1 180px;
-  background: #9c7a74;
-  color: white;
-  padding: 20px;
-  border-radius: 15px;
-  text-align: center;
-  font-weight: bold;
-  font-size: 1.2rem;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-}
-
-#stats p:hover {
-  background: #64402e;
-  transform: translateY(-3px);
-  box-shadow: 0 15px 30px rgba(235, 232, 232, 0.4);
-}
-
-/* Charts grid small addition */
-.charts-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 16px;
-}
-
-/* chart card */
-.chart-card {
-    background: rgba(255, 255, 255, 0.95);
-    color: #2c3e50;
-    padding: 12px;
-    border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-}
-/*  TABLES  */
 table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-  background: rgba(198, 198, 194, 0.97);
-  border-radius: 15px;
-  overflow: hidden;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.35);
-  color: #2c3e50;
-}
-
-th, td {
-  padding: 14px 16px;
-  text-align: left;
+    width: 100%;
+    border-collapse: collapse;
 }
 
 th {
-  background: #b0af9e;
-  color: white;
+    text-align: left;
+    padding: 15px;
+    color: #999;
+    font-size: 14px;
+    border-bottom: 2px solid #f8f9fa;
 }
 
-/*  UTILS  */
-.hidden {
-  display: none;
+td {
+    padding: 15px;
+    border-bottom: 1px solid #f8f9fa;
+}
+
+.add-btn {
+    background: #a5d6a7;
+    color: #1b5e20;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 15px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* ============================================================
+   6. MODAL / POPUP
+   ============================================================ */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 300;
+}
+
+.modal-card {
+    background: white;
+    padding: 30px;
+    border-radius: 30px;
+    width: 400px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-save {
+    flex: 1;
+    background: var(--pink-pastel);
+    border: none;
+    padding: 12px;
+    border-radius: 15px;
+    color: #ad1457;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-cancel {
+    background: #eee;
+    border: none;
+    padding: 12px;
+    border-radius: 15px;
+    cursor: pointer;
 }
