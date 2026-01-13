@@ -1,12 +1,10 @@
-/* ===== Projet complet simplifié mais conforme à l'énoncé ===== */
-
-/* ===== Utilisateurs (admin + assma) ===== */
+/* ================= USERS ================= */
 const users = [
   { username: "admin", password: "admin" },
   { username: "assma", password: "1234" }
 ];
 
-/* ===== DOM elements ===== */
+/* ================= DOM ================= */
 const loginForm = document.getElementById("login-form");
 const usernameEl = document.getElementById("username");
 const passwordEl = document.getElementById("password");
@@ -17,9 +15,10 @@ const formPopup = document.getElementById("form-popup");
 const formFields = document.getElementById("form-fields");
 const formTitle = document.getElementById("form-title");
 const entityForm = document.getElementById("entity-form");
-const searchInput = document.getElementById("search-input");
+const globalSearchInput = document.getElementById("global-search");
+const globalSearchBtn = document.getElementById("global-search-btn");
 
-/* ===== Entités et champs ===== */
+/* ================= ENTITIES ================= */
 const keys = ["livres", "auteurs", "adherents", "emprunts", "categories"];
 const fields = {
   livres: ["titre", "auteur", "categorie"],
@@ -29,406 +28,289 @@ const fields = {
   categories: ["nom"]
 };
 
-/* ===== Traductions (FR/EN/AR) ===== */
+/* ================= TRANSLATIONS ================= */
 const translations = {
-  fr: {
-    dashboard: "Tableau de Bord", livres: "Livres", auteurs: "Auteurs",
-    adherents: "Adhérents", emprunts: "Emprunts", categories: "Catégories",
-    connexion: "Connexion", deconnexion: "Déconnexion", ajouter: "+ Ajouter",
-    exporterCSV: "Exporter CSV", exporterPDF: "Exporter PDF"
-  },
-  en: {
-    dashboard: "Dashboard", livres: "Books", auteurs: "Authors",
-    adherents: "Members", emprunts: "Loans", categories: "Categories",
-    connexion: "Sign in", deconnexion: "Sign out", ajouter: "+ Add",
-    exporterCSV: "Export CSV", exporterPDF: "Export PDF"
-  },
-  ar: {
-    dashboard: "لوحة التحكم", livres: "الكتب", auteurs: "المؤلفون",
-    adherents: "الأعضاء", emprunts: "الإعارات", categories: "الفئات",
-    connexion: "تسجيل الدخول", deconnexion: "تسجيل الخروج", ajouter: "+ إضافة",
-    exporterCSV: "تصدير CSV", exporterPDF: "تصدير PDF"
-  }
+  fr: { dashboard:"Tableau de Bord", livres:"Livres", auteurs:"Auteurs", adherents:"Adhérents", emprunts:"Emprunts", categories:"Catégories" },
+  en: { dashboard:"Dashboard", livres:"Books", auteurs:"Authors", adherents:"Members", emprunts:"Loans", categories:"Categories" },
+  ar: { dashboard:"لوحة التحكم", livres:"الكتب", auteurs:"المؤلفون", adherents:"الأعضاء", emprunts:"الإعارات", categories:"الفئات" }
 };
 
-/* ===== Login handling ===== */
+/* ================= LOGIN ================= */
 loginForm.onsubmit = e => {
   e.preventDefault();
   const u = usernameEl.value.trim();
   const p = passwordEl.value.trim();
-  if (users.some(x => x.username === u && x.password === p)) {
+  if(users.some(x => x.username === u && x.password === p)){
     loginPage.classList.add("hidden");
     app.classList.remove("hidden");
     initStorage();
     showSection("dashboard");
   } else {
     loginError.textContent = "Connexion invalide";
-    setTimeout(() => loginError.textContent = "", 2500);
+    setTimeout(()=>loginError.textContent="",2000);
   }
 };
 
-function logout() {
+function logout(){
   app.classList.add("hidden");
   loginPage.classList.remove("hidden");
   loginForm.reset();
 }
 
-/* ===== Initialisation localStorage (exemples) ===== */
-function initStorage() {
-  if (!localStorage.getItem("livres")) {
-    localStorage.setItem("livres", JSON.stringify([
-      { titre: "1984", auteur: "George Orwell", categorie: "Roman" },
-      { titre: "Le Petit Prince", auteur: "Antoine de Saint-Exupéry", categorie: "Conte" }
-    ]));
-  }
-  if (!localStorage.getItem("auteurs")) {
-    localStorage.setItem("auteurs", JSON.stringify([
-      { nom: "Orwell", prenom: "George" },
-      { nom: "Saint-Exupéry", prenom: "Antoine" }
-    ]));
-  }
-  if (!localStorage.getItem("adherents")) {
-    localStorage.setItem("adherents", JSON.stringify([
-      { nom: "Ben", email: "ben@example.com", inscriptionDate: lastNDaysISO(30) }
-    ]));
-  }
-  if (!localStorage.getItem("emprunts")) {
-    localStorage.setItem("emprunts", JSON.stringify([]));
-  }
-  if (!localStorage.getItem("categories")) {
-    localStorage.setItem("categories", JSON.stringify([
-      { nom: "Roman" }, { nom: "Conte" }, { nom: "Science" }
-    ]));
+/* ================= STORAGE INIT ================= */
+function initStorage(){
+  keys.forEach(k=>{
+    if(!localStorage.getItem(k)) localStorage.setItem(k, JSON.stringify([]));
+  });
+  renderAll();
+}
+
+/* ================= SIDEBAR ================= */
+function toggleSidebar(){
+  const s = document.getElementById("mySidebar");
+  s.style.width = s.style.width === "250px" ? "0" : "250px";
+}
+
+function showSection(id){
+  document.querySelectorAll("main section").forEach(s=>s.style.display="none");
+  document.getElementById(id).style.display="block";
+  document.getElementById("mySidebar").style.width="0";
+}
+
+/* ================= CRUD ================= */
+let currentEntity = null;
+let editIndex = null;
+
+function showForm(entity, i=null){
+  currentEntity = entity;
+  editIndex = i;
+  formPopup.classList.remove("hidden");
+  formFields.innerHTML = "";
+  formTitle.textContent = (i===null?"Ajouter ":"Modifier ") + entity;
+
+  const data = i!==null ? JSON.parse(localStorage.getItem(entity))[i] : {};
+  fields[entity].forEach(f=>{
+    const type = f.includes("date") ? "date" : f==="email" ? "email":"text";
+    formFields.innerHTML += `<input name="${f}" type="${type}" value="${data[f]||""}" placeholder="${f}" required>`;
+  });
+}
+
+function closeForm(){
+  formPopup.classList.add("hidden");
+  entityForm.reset();
+}
+
+entityForm.onsubmit = e=>{
+  e.preventDefault();
+  const arr = JSON.parse(localStorage.getItem(currentEntity));
+  const obj = {};
+  [...e.target.elements].forEach(el=>el.name&&(obj[el.name]=el.value));
+  editIndex!==null ? arr[editIndex]=obj : arr.push(obj);
+  localStorage.setItem(currentEntity, JSON.stringify(arr));
+  closeForm();
+  renderAll();  // Render all tables immediately
+};
+
+/* ================= RENDER ================= */
+function renderList(entity){
+  const arr = JSON.parse(localStorage.getItem(entity));
+  const div = document.getElementById(entity+"-list");
+  if(!div) return;
+  if(!arr.length){ div.innerHTML="<p style='color:white'>Aucun élément</p>"; return; }
+
+  const headers = Object.keys(arr[0]);
+  let html="<table><tr>";
+  headers.forEach(h=>html+=`<th>${h}</th>`);
+  html+="<th>Actions</th></tr>";
+  arr.forEach((o,i)=>{
+    html+="<tr>";
+    headers.forEach(h=>html+=`<td>${o[h]}</td>`);
+    html+=`<td>
+      <button onclick="showForm('${entity}',${i})">✏</button>
+      <button onclick="delItem('${entity}',${i})">🗑</button>
+    </td></tr>`;
+  });
+  html+="</table>";
+  div.innerHTML=html;
+}
+
+function delItem(entity,i){
+  if(!confirm("Supprimer ?")) return;
+  const arr=JSON.parse(localStorage.getItem(entity));
+  arr.splice(i,1);
+  localStorage.setItem(entity,JSON.stringify(arr));
+  renderAll();
+}
+
+/* ================= DASHBOARD ================= */
+function updateDashboard(){
+  keys.forEach(k=>{
+    const el=document.getElementById("count-"+k);
+    if(el) el.textContent=JSON.parse(localStorage.getItem(k)).length;
+  });
+}
+
+/* ================= GOOGLE BOOKS API ================= */
+async function searchBooksAPI(){
+  const q=globalSearchInput.value.trim();
+  if(!q) return;
+  const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}`);
+  const data = await res.json();
+  displayAPIBooks(data.items||[]);
+}
+
+function displayAPIBooks(books){
+  const c=document.getElementById("global-search-results");
+  if(!books.length){ c.innerHTML="<p>No results</p>"; return; }
+
+  c.innerHTML = books.slice(0,5).map(b=>{
+    const i=b.volumeInfo;
+    return `<div style="margin-bottom:10px;">
+      <strong>${i.title||"No title"}</strong><br>
+      ${i.authors?i.authors.join(", "):"Unknown"}<br>
+      ${i.categories?i.categories[0]:"General"}<br>
+      <button onclick="addBookFull(
+        '${safe(i.title)}',
+        '${safe(i.authors?i.authors.join("|"):"Unknown")}',
+        '${safe(i.categories?i.categories[0]:"General")}'
+      )">➕ Ajouter</button>
+    </div>`;
+  }).join("");
+}
+
+function safe(s){ return (s||"").replace(/'/g,"\\'"); }
+
+/* ================= ADD BOOK + AUTOMATIC UPDATES ================= */
+function addBookFull(title, authors, category){
+  const today = new Date().toISOString().split("T")[0]; // yyyy-mm-dd
+
+  // 1️⃣ Livres
+  const livres = JSON.parse(localStorage.getItem("livres"))||[];
+  if(!livres.some(b=>b.titre===title)){
+    livres.push({ titre:title, auteur:authors.replace(/\|/g,", "), categorie:category });
+    localStorage.setItem("livres", JSON.stringify(livres));
   }
 
-  // render lists and dashboard
+  // 2️⃣ Auteurs
+  const auteurs = JSON.parse(localStorage.getItem("auteurs"))||[];
+  authors.split("|").forEach(a=>{
+    const name=a.trim();
+    if(!auteurs.some(x=>x.nom===name)){
+      auteurs.push({ nom:name, prenom:"" });
+    }
+  });
+  localStorage.setItem("auteurs", JSON.stringify(auteurs));
+
+  // 3️⃣ Catégories
+  const categories = JSON.parse(localStorage.getItem("categories"))||[];
+  if(!categories.some(c=>c.nom===category)) categories.push({ nom:category });
+  localStorage.setItem("categories", JSON.stringify(categories));
+
+  // 4️⃣ Adhérents
+  const adherents = JSON.parse(localStorage.getItem("adherents"))||[];
+  const memberName = "Member of " + title;
+  if(!adherents.some(a=>a.nom===memberName)){
+    adherents.push({ nom:memberName, email:"", inscriptionDate:today });
+  }
+  localStorage.setItem("adherents", JSON.stringify(adherents));
+
+  // 5️⃣ Emprunts
+  const emprunts = JSON.parse(localStorage.getItem("emprunts"))||[];
+  if(!emprunts.some(e=>e.livre===title && e.adherent===memberName)){
+    emprunts.push({ livre:title, adherent:memberName, date:today });
+  }
+  localStorage.setItem("emprunts", JSON.stringify(emprunts));
+
+  renderAll(); // Refresh all tables and dashboard
+}
+
+/* ================= GLOBAL SEARCH ================= */
+function filterGlobal(){
+  const q = globalSearchInput.value.toLowerCase();
+  keys.forEach(k=>{
+    const arr = JSON.parse(localStorage.getItem(k));
+    const filtered = arr.filter(item=>{
+      return Object.values(item).some(v=>v.toLowerCase().includes(q));
+    });
+    renderFilteredList(k, filtered);
+  });
+}
+
+function renderFilteredList(entity, arr){
+  const div = document.getElementById(entity+"-list");
+  if(!div) return;
+  if(!arr.length){ div.innerHTML="<p style='color:white'>Aucun résultat</p>"; return; }
+
+  const headers = Object.keys(arr[0]);
+  let html="<table><tr>";
+  headers.forEach(h=>html+=`<th>${h}</th>`);
+  html+="</tr>";
+  arr.forEach(o=>{
+    html+="<tr>";
+    headers.forEach(h=>html+=`<td>${o[h]}</td>`);
+    html+="</tr>";
+  });
+  html+="</table>";
+  div.innerHTML=html;
+}
+
+/* ================= EXPORT ================= */
+function exportCSV(entity){
+  const arr=JSON.parse(localStorage.getItem(entity));
+  if(!arr.length) return alert("Aucune donnée");
+  const csv = Object.keys(arr[0]).join(",") + "\n" + arr.map(o=>Object.values(o).join(",")).join("\n");
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([csv]));
+  a.download=entity+".csv";
+  a.click();
+}
+
+async function exportPDF(entity){
+  const arr=JSON.parse(localStorage.getItem(entity));
+  if(!arr.length) return;
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  doc.text(entity.toUpperCase(), 20, 20);
+  arr.forEach((o,i)=> doc.text(JSON.stringify(o),20,40+i*15));
+  doc.save(entity+".pdf");
+}
+
+/* ================= RENDER ALL ================= */
+function renderAll(){
   keys.forEach(renderList);
   updateDashboard();
   renderAllCharts();
 }
 
-/* ===== Sidebar & navigation ===== */
-function toggleSidebar() {
-  const sidebar = document.getElementById("mySidebar");
-  const isOpen = sidebar.style.width === "250px";
-  sidebar.style.width = isOpen ? "0" : "250px";
+/* ================= CHARTS ================= */
+let charts=[];
+function renderAllCharts(){
+  charts.forEach(c=>c.destroy());
+  charts=[];
 }
 
-function showSection(id) {
-  document.querySelectorAll("main section").forEach(s => s.style.display = "none");
-  const sec = document.getElementById(id);
-  if (sec) sec.style.display = "block";
-  const sidebar = document.getElementById("mySidebar");
-  if (sidebar) sidebar.style.width = "0";
-  updateDashboard();
-  renderAllCharts();
+/* ================= LANGUAGE ================= */
+function changeLanguage(){
+  const lang=document.getElementById("lang").value;
+  document.body.dir = lang==="ar"?"rtl":"ltr";
+  document.getElementById("title-dashboard").textContent = translations[lang].dashboard;
 }
 
-/* ===== Recherche simple ===== */
-function filterTable() {
-  const q = (searchInput.value || "").toLowerCase();
-  const active = Array.from(document.querySelectorAll("main section")).find(s => s.style.display !== "none");
-  if (!active) return;
-  const rows = active.querySelectorAll("table tr");
-  rows.forEach((r, i) => {
-    if (i === 0) return;
-    r.style.display = r.textContent.toLowerCase().includes(q) ? "" : "none";
-  });
-}
-
-/* ===== Dashboard compteurs ===== */
-function updateDashboard() {
-  keys.forEach(k => {
-    const el = document.getElementById("count-" + k);
-    if (el) {
-      const arr = JSON.parse(localStorage.getItem(k) || "[]");
-      el.textContent = arr.length;
-    }
-  });
-}
-
-/* ===== CRUD simple ===== */
-let currentEntity = null;
-let editIndex = null;
-
-function showForm(entity, i = null) {
-  currentEntity = entity;
-  editIndex = i;
-  formPopup.classList.remove("hidden");
-  formFields.innerHTML = "";
-  formTitle.textContent = (i === null ? "Ajouter " : "Modifier ") + entity;
-
-  const data = i !== null ? JSON.parse(localStorage.getItem(entity))[i] : {};
-  fields[entity].forEach(f => {
-    const value = data[f] || (f === "date" || f === "inscriptionDate" ? todayISO() : "");
-    const type = f === "email" ? "email" : (f === "date" || f === "inscriptionDate" ? "date" : "text");
-    formFields.innerHTML += `<input name="${f}" type="${type}" value="${value}" placeholder="${f}" required style="display:block; width:100%; margin-bottom:10px; padding:8px;">`;
-  });
-}
-
-function closeForm() {
-  formPopup.classList.add("hidden");
-  entityForm.reset();
-}
-
-entityForm.onsubmit = e => {
-  e.preventDefault();
-  const arr = JSON.parse(localStorage.getItem(currentEntity) || "[]");
-  const obj = {};
-  [...e.target.elements].forEach(el => {
-    if (el.name) obj[el.name] = el.value;
-  });
-  if (editIndex !== null) arr[editIndex] = obj;
-  else arr.push(obj);
-  localStorage.setItem(currentEntity, JSON.stringify(arr));
-  closeForm();
-  renderList(currentEntity);
-  updateDashboard();
-  renderAllCharts();
-};
-
-/* ===== Render lists ===== */
-function renderList(entity) {
-  const arr = JSON.parse(localStorage.getItem(entity) || "[]");
-  const container = document.getElementById(entity + "-list");
-  if (!container) return;
-  if (!arr.length) {
-    container.innerHTML = "<p style='color:white;'>Aucun élément</p>";
-    return;
-  }
-
-  const headers = Object.keys(arr[0]);
-  let html = "<table><tr>";
-  headers.forEach(h => html += `<th>${h}</th>`);
-  html += "<th>Actions</th></tr>";
-
-  arr.forEach((item, idx) => {
-    html += "<tr>";
-    headers.forEach(h => html += `<td>${item[h] ?? ""}</td>`);
-    html += `<td>
-      <button onclick="showForm('${entity}', ${idx})" style="background:#f39c12;color:white;border:none;padding:5px;cursor:pointer;">✏</button>
-      <button onclick="delItem('${entity}', ${idx})" style="background:#e74c3c;color:white;border:none;padding:5px;cursor:pointer;">🗑</button>
-    </td></tr>`;
-  });
-
-  html += "</table>";
-  container.innerHTML = html;
-}
-
-function delItem(entity, idx) {
-  if (!confirm("Voulez-vous vraiment supprimer cet élément ?")) return;
-  const arr = JSON.parse(localStorage.getItem(entity) || "[]");
-  arr.splice(idx, 1);
-  localStorage.setItem(entity, JSON.stringify(arr));
-  renderList(entity);
-  updateDashboard();
-  renderAllCharts();
-}
-
-/* ===== Export CSV simple ===== */
-function exportCSV(entity) {
-  const arr = JSON.parse(localStorage.getItem(entity) || "[]");
-  if (!arr.length) return alert("Aucune donnée à exporter");
-  const header = Object.keys(arr[0]).join(",");
-  const rows = arr.map(o => Object.values(o).map(v => `"${(v||"").toString().replace(/"/g,'""')}"`).join(","));
-  const csv = header + "\n" + rows.join("\n");
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = entity + ".csv";
-  a.click();
-  URL.revokeObjectURL(a.href);
-}
-
-/* ===== Export PDF simple via jsPDF (table as text) ===== */
-async function exportPDF(entity) {
-  const arr = JSON.parse(localStorage.getItem(entity) || "[]");
-  if (!arr.length) return alert("Aucune donnée à exporter");
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ unit: "pt", format: "a4" });
-  const title = entity.toUpperCase();
-  doc.setFontSize(14);
-  doc.text(title, 40, 40);
-
-  const headers = Object.keys(arr[0]);
-  const startY = 70;
-  const rowHeight = 18;
-  let y = startY;
-
-  // header
-  doc.setFontSize(10);
-  headers.forEach((h, i) => {
-    doc.text(h.toString(), 40 + i * 120, y);
-  });
-  y += rowHeight;
-
-  // rows (simple, no wrapping)
-  arr.forEach(row => {
-    headers.forEach((h, i) => {
-      const text = (row[h] ?? "").toString().slice(0, 40);
-      doc.text(text, 40 + i * 120, y);
-    });
-    y += rowHeight;
-    if (y > 750) { doc.addPage(); y = 40; }
-  });
-
-  doc.save(entity + ".pdf");
-}
-
-/* ===== Charts (Chart.js) - 5 graphiques ===== */
-let charts = [];
-
-function clearCharts() {
-  charts.forEach(c => c && c.destroy && c.destroy());
-  charts = [];
-}
-
-function renderAllCharts() {
-  clearCharts();
-  renderChartLivresByCategory();
-  renderChartAuteurs();
-  renderChartAdherents();
-  renderChartEmprunts();
-  renderChartCategoriesPie();
-}
-
-/* Chart 1: Livres par catégorie (bar) */
-function renderChartLivresByCategory() {
-  const ctx = document.getElementById("chartLivres");
-  if (!ctx) return;
-  const livres = JSON.parse(localStorage.getItem("livres") || "[]");
-  const categories = JSON.parse(localStorage.getItem("categories") || "[]").map(c => c.nom);
-  const labels = categories.length ? categories : ["Aucune catégorie"];
-  const data = labels.map(cat => livres.filter(l => l.categorie === cat).length);
-  charts.push(new Chart(ctx, {
-    type: "bar",
-    data: { labels, datasets: [{ label: "Livres", data, backgroundColor: "#3498db" }] },
-    options: { responsive: true, maintainAspectRatio: false }
-  }));
-}
-
-/* Chart 2: Auteurs (doughnut) */
-function renderChartAuteurs() {
-  const ctx = document.getElementById("chartAuteurs");
-  if (!ctx) return;
-  const auteurs = JSON.parse(localStorage.getItem("auteurs") || "[]");
-  const labels = auteurs.map(a => `${a.prenom || ""} ${a.nom || ""}`.trim() || "—");
-  const data = labels.map(() => 1);
-  charts.push(new Chart(ctx, {
-    type: "doughnut",
-    data: { labels, datasets: [{ data, backgroundColor: generateColors(labels.length) }] },
-    options: { responsive: true, maintainAspectRatio: false }
-  }));
-}
-
-/* Chart 3: Adhérents inscriptions (line, last 6 months) */
-function renderChartAdherents() {
-  const ctx = document.getElementById("chartAdherents");
-  if (!ctx) return;
-  const adherents = JSON.parse(localStorage.getItem("adherents") || "[]");
-  const months = lastNMonths(6);
-  const data = months.map(m => adherents.filter(a => (a.inscriptionDate || "").startsWith(m)).length);
-  charts.push(new Chart(ctx, {
-    type: "line",
-    data: { labels: months, datasets: [{ label: "Inscriptions", data, borderColor: "#2ecc71", backgroundColor: "rgba(46,204,113,0.2)", fill: true }] },
-    options: { responsive: true, maintainAspectRatio: false }
-  }));
-}
-
-/* Chart 4: Emprunts per month (bar, last 6 months) */
-function renderChartEmprunts() {
-  const ctx = document.getElementById("chartEmprunts");
-  if (!ctx) return;
-  const emprunts = JSON.parse(localStorage.getItem("emprunts") || "[]");
-  const months = lastNMonths(6);
-  const data = months.map(m => emprunts.filter(e => (e.date || "").startsWith(m)).length);
-  charts.push(new Chart(ctx, {
-    type: "bar",
-    data: { labels: months, datasets: [{ label: "Emprunts", data, backgroundColor: "#f39c12" }] },
-    options: { responsive: true, maintainAspectRatio: false }
-  }));
-}
-
-/* Chart 5: Categories pie */
-function renderChartCategoriesPie() {
-  const ctx = document.getElementById("chartCategories");
-  if (!ctx) return;
-  const categories = JSON.parse(localStorage.getItem("categories") || "[]").map(c => c.nom);
-  const livres = JSON.parse(localStorage.getItem("livres") || "[]");
-  const data = categories.map(cat => livres.filter(l => l.categorie === cat).length);
-  charts.push(new Chart(ctx, {
-    type: "pie",
-    data: { labels: categories, datasets: [{ data, backgroundColor: generateColors(categories.length) }] },
-    options: { responsive: true, maintainAspectRatio: false }
-  }));
-}
-
-/* Helpers for charts */
-function generateColors(n) {
-  const palette = ['#e74c3c','#2ecc71','#3498db','#9b59b6','#f1c40f','#e67e22','#1abc9c','#34495e'];
-  const out = [];
-  for (let i = 0; i < n; i++) out.push(palette[i % palette.length]);
-  return out;
-}
-
-function lastNMonths(n) {
-  const res = [];
-  const d = new Date();
-  for (let i = n - 1; i >= 0; i--) {
-    const dt = new Date(d.getFullYear(), d.getMonth() - i, 1);
-    res.push(dt.toISOString().slice(0, 7)); // YYYY-MM
-  }
-  return res;
-}
-
-/* ===== Utilitaires ===== */
-function todayISO() { return new Date().toISOString().slice(0, 10); }
-function lastNDaysISO(n) {
-  const d = new Date();
-  d.setDate(d.getDate() - n);
-  return d.toISOString().slice(0, 10);
-}
-
-
-/* ===== INTERNATIONALISATION (simple) ===== */
-function setLang(lang){
-  const t = translations[lang] || translations.fr;
-  document.getElementById('title-dashboard').textContent = t.dashboard;
-  document.getElementById('title-livres').textContent = `Liste des ${t.livres}`;
-  document.getElementById('title-auteurs').textContent = `Liste des ${t.auteurs}`;
-  document.getElementById('title-adherents').textContent = `Liste des ${t.adherents}`;
-  document.getElementById('title-emprunts').textContent = `Liste des ${t.emprunts}`;
-  document.getElementById('title-categories').textContent = `Liste des ${t.categories}`;
-  // Sidebar links
-  document.querySelector("a[onclick=\"showSection('dashboard')\"]").textContent = ` ${t.dashboard}`;
-  document.querySelector("a[onclick=\"showSection('livres')\"]").textContent = ` ${t.livres}`;
-  document.querySelector("a[onclick=\"showSection('auteurs')\"]").textContent = ` ${t.auteurs}`;
-  document.querySelector("a[onclick=\"showSection('adherents')\"]").textContent = ` ${t.adherents}`;
-  document.querySelector("a[onclick=\"showSection('emprunts')\"]").textContent = ` ${t.emprunts}`;
-  document.querySelector("a[onclick=\"showSection('categories')\"]").textContent = ` ${t.categories}`;
-
-  // Update buttons text
-  document.querySelectorAll("section").forEach(sec => {
-    sec.querySelectorAll("button").forEach(btn => {
-      if (btn.textContent.includes("+") || btn.textContent.toLowerCase().includes("ajouter") || btn.textContent.toLowerCase().includes("add")) {
-        btn.textContent = t.ajouter;
-      } else if (btn.textContent.toLowerCase().includes("csv") || btn.textContent.toLowerCase().includes("export")) {
-        if (btn.textContent.toLowerCase().includes("pdf")) btn.textContent = t.exporterPDF;
-        else btn.textContent = t.exporterCSV;
-      }
-    });
-  });
-}
-
-/* ===== INITIAL CALLS WHEN LOADED ===== */
-window.addEventListener('load', () => {
-  // Hide sidebar on small screens
-  document.getElementById("mySidebar").style.width = "0";
-  // Ensure dashboard charts resize properly
-  window.addEventListener('resize', () => renderAllCharts());
-  // render lists if storage exists
-  keys.forEach(k => renderList(k));
-  updateDashboard();
-  renderAllCharts();
-  setLang('fr'); // default language
+/* ================= GLOBAL SEARCH EVENTS ================= */
+globalSearchBtn.addEventListener("click", ()=>{
+  filterGlobal();
+  searchBooksAPI();
 });
+
+globalSearchInput.addEventListener("keyup",(e)=>{
+  if(e.key==="Enter"){
+    filterGlobal();
+    searchBooksAPI();
+  }
+});
+
+/* ================= INIT ================= */
+window.onload = ()=>{
+  document.getElementById("mySidebar").style.width="0";
+  renderAll();
+};
