@@ -1,4 +1,4 @@
-/*  GLOBAL  */
+/* ================= GLOBAL ================= */
 * {
   box-sizing: border-box;
 }
@@ -15,7 +15,7 @@ html, body {
   background-attachment: fixed;
 }
 
-/* Overlay sombre */
+/* Dark overlay */
 body::before {
   content: "";
   position: fixed;
@@ -29,7 +29,7 @@ body::before {
   z-index: 1;
 }
 
-/* ================== LOGIN ================== */
+/* ================= LOGIN ================= */
 .centered {
   max-width: 360px;
   margin: 120px auto;
@@ -75,11 +75,10 @@ body::before {
   font-size: 0.9rem;
 }
 
-
-/*  SIDEBAR   */
+/* ================= SIDEBAR ================= */
 .sidebar {
   height: 100%;
-  width: 250px;
+  width: 0;
   position: fixed;
   z-index: 1001;
   top: 0;
@@ -103,7 +102,7 @@ body::before {
 
 .sidebar a:hover {
   background-color: #42372c;
-  padding-left: 35px; 
+  padding-left: 35px;
 }
 
 .sidebar .closebtn {
@@ -111,10 +110,9 @@ body::before {
   top: 0;
   right: 25px;
   font-size: 36px;
-  border: none;
 }
 
-
+/* Menu button */
 .menu-btn {
   font-size: 20px;
   cursor: pointer;
@@ -131,13 +129,18 @@ body::before {
   box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 
-/*  MAIN & SEARCH  */
+/* ================= MAIN ================= */
 main {
   padding: 20px;
-  margin-top: 50px;
+  margin-top: 60px;
 }
 
-
+/* Search bar */
+.search-container {
+  max-width: 350px;
+  margin-left: auto;
+  margin-bottom: 15px;
+}
 
 #search-input {
   width: 100%;
@@ -150,7 +153,7 @@ main {
   box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
 
-/*  DASHBOARD  */
+/* ================= DASHBOARD ================= */
 #stats {
   display: flex;
   flex-wrap: wrap;
@@ -172,25 +175,26 @@ main {
 #stats p:hover {
   background: #64402e;
   transform: translateY(-3px);
-  box-shadow: 0 15px 30px rgba(235, 232, 232, 0.4);
 }
 
-/* Charts grid small addition */
+/* Charts grid */
 .charts-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
 }
 
-/* chart card */
 .chart-card {
-    background: rgba(255, 255, 255, 0.95);
-    color: #2c3e50;
-    padding: 12px;
-    border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  background: rgba(255,255,255,0.95);
+  color: #2c3e50;
+  padding: 12px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  height: 240px;
 }
-/*  TABLES  */
+
+/* ================= TABLES ================= */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -212,7 +216,54 @@ th {
   color: white;
 }
 
-/*  UTILS  */
+td button {
+  border-radius: 5px;
+}
+
+/* ================= BUTTONS ================= */
+button {
+  background: #996346;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-right: 5px;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+/* ================= API RESULTS ================= */
+#api-results div {
+  background: #f1f1f1;
+  color: #2c3e50;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+/* ================= POPUP FORM ================= */
+#form-popup input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* ================= UTILS ================= */
 .hidden {
   display: none;
+}
+
+/* ================= RTL (Arabic) ================= */
+body[dir="rtl"] {
+  direction: rtl;
+}
+
+body[dir="rtl"] .sidebar {
+  left: auto;
+  right: 0;
 }
