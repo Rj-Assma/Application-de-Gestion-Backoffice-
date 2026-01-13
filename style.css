@@ -75,6 +75,23 @@ body::before {
   font-size: 0.9rem;
 }
 
+/*lang-select*/
+#lang {
+  padding: 8px;
+  border-radius: 8px;
+  border: none;
+  background: #d7cec9;
+  color: #2c3e50;
+  font-weight: bold;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  /*position fixed to top right*/
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  z-index: 1002;
+}
+
+
 /* ================= SIDEBAR ================= */
 .sidebar {
   height: 100%;
@@ -116,7 +133,7 @@ body::before {
 .menu-btn {
   font-size: 20px;
   cursor: pointer;
-  background-color: #b9a296;
+  background-color: #d7cec9;
   color: #2c3e50;
   padding: 10px 15px;
   border: none;
@@ -142,6 +159,8 @@ main {
   margin-bottom: 15px;
 }
 
+
+
 #search-input {
   width: 100%;
   padding: 12px;
@@ -152,6 +171,7 @@ main {
   font-size: 16px;
   box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
+
 
 /* ================= DASHBOARD ================= */
 #stats {
