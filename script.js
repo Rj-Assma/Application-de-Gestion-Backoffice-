@@ -30,10 +30,56 @@ const fields = {
 
 /* ================= TRANSLATIONS ================= */
 const translations = {
-  fr: { dashboard:"Tableau de Bord", livres:"Livres", auteurs:"Auteurs", adherents:"Adhérents", emprunts:"Emprunts", categories:"Catégories" },
-  en: { dashboard:"Dashboard", livres:"Books", auteurs:"Authors", adherents:"Members", emprunts:"Loans", categories:"Categories" },
-  ar: { dashboard:"لوحة التحكم", livres:"الكتب", auteurs:"المؤلفون", adherents:"الأعضاء", emprunts:"الإعارات", categories:"الفئات" }
+  fr: {
+    dashboard: "Tableau de Bord",
+    livres: "Livres",
+    auteurs: "Auteurs",
+    adherents: "Adhérents",
+    emprunts: "Emprunts",
+    categories: "Catégories"
+  },
+  en: {
+    dashboard: "Dashboard",
+    livres: "Books",
+    auteurs: "Authors",
+    adherents: "Members",
+    emprunts: "Loans",
+    categories: "Categories"
+  },
+  ar: {
+    dashboard: "لوحة التحكم",
+    livres: "الكتب",
+    auteurs: "المؤلفون",
+    adherents: "الأعضاء",
+    emprunts: "الإعارات",
+    categories: "الفئات"
+  }
 };
+
+/* ================= LANGUAGE ================= */
+function changeLanguage() {
+  const lang = document.getElementById("lang").value;
+
+  
+  // Titres des sections
+  document.getElementById("title-dashboard").textContent = translations[lang].dashboard;
+  keys.forEach(k => {
+    const el = document.getElementById("title-" + k);
+    if (el) el.textContent = translations[lang][k];
+  });
+
+  // Menu sidebar
+  document.getElementById("menu-dashboard").textContent = translations[lang].dashboard;
+  document.getElementById("menu-livres").textContent = translations[lang].livres;
+  document.getElementById("menu-auteurs").textContent = translations[lang].auteurs;
+  document.getElementById("menu-adherents").textContent = translations[lang].adherents;
+  document.getElementById("menu-emprunts").textContent = translations[lang].emprunts;
+  document.getElementById("menu-categories").textContent = translations[lang].categories;
+}
+keys.forEach(k=>{
+  const el=document.getElementById("title-"+k);
+  if(el) el.textContent = translations[document.getElementById("lang").value][k];
+});
 
 /* ================= LOGIN ================= */
 loginForm.onsubmit = e => {
@@ -282,19 +328,115 @@ function renderAll(){
   renderAllCharts();
 }
 
-/* ================= CHARTS ================= */
-let charts=[];
-function renderAllCharts(){
-  charts.forEach(c=>c.destroy());
-  charts=[];
+/* ===== Charts (Chart.js) - 5 graphiques ===== */
+let charts = [];
+
+function clearCharts() {
+  charts.forEach(c => c && c.destroy && c.destroy());
+  charts = [];
 }
 
-/* ================= LANGUAGE ================= */
-function changeLanguage(){
-  const lang=document.getElementById("lang").value;
-  document.body.dir = lang==="ar"?"rtl":"ltr";
-  document.getElementById("title-dashboard").textContent = translations[lang].dashboard;
+function renderAllCharts() {
+  clearCharts();
+  renderChartLivresByCategory();
+  renderChartAuteurs();
+  renderChartAdherents();
+  renderChartEmprunts();
+  renderChartCategoriesPie();
 }
+
+/* Chart 1: Livres par catégorie (bar) */
+function renderChartLivresByCategory() {
+  const ctx = document.getElementById("chartLivres");
+  if (!ctx) return;
+  const livres = JSON.parse(localStorage.getItem("livres") || "[]");
+  const categories = JSON.parse(localStorage.getItem("categories") || "[]").map(c => c.nom);
+  const labels = categories.length ? categories : ["Aucune catégorie"];
+  const data = labels.map(cat => livres.filter(l => l.categorie === cat).length);
+  charts.push(new Chart(ctx, {
+    type: "bar",
+    data: { labels, datasets: [{ label: "Livres", data, backgroundColor: "#3498db" }] },
+    options: { responsive: true, maintainAspectRatio: false }
+  }));
+}
+
+/* Chart 2: Auteurs (doughnut) */
+function renderChartAuteurs() {
+  const ctx = document.getElementById("chartAuteurs");
+  if (!ctx) return;
+  const auteurs = JSON.parse(localStorage.getItem("auteurs") || "[]");
+  const labels = auteurs.map(a => `${a.prenom || ""} ${a.nom || ""}`.trim() || "—");
+  const data = labels.map(() => 1);
+  charts.push(new Chart(ctx, {
+    type: "doughnut",
+    data: { labels, datasets: [{ data, backgroundColor: generateColors(labels.length) }] },
+    options: { responsive: true, maintainAspectRatio: false }
+  }));
+}
+
+/* Chart 3: Adhérents inscriptions (line, last 6 months) */
+function renderChartAdherents() {
+  const ctx = document.getElementById("chartAdherents");
+  if (!ctx) return;
+  const adherents = JSON.parse(localStorage.getItem("adherents") || "[]");
+  const months = lastNMonths(6);
+  const data = months.map(m => adherents.filter(a => (a.inscriptionDate || "").startsWith(m)).length);
+  charts.push(new Chart(ctx, {
+    type: "line",
+    data: { labels: months, datasets: [{ label: "Inscriptions", data, borderColor: "#2ecc71", backgroundColor: "rgba(46,204,113,0.2)", fill: true }] },
+    options: { responsive: true, maintainAspectRatio: false }
+  }));
+}
+
+/* Chart 4: Emprunts per month (bar, last 6 months) */
+function renderChartEmprunts() {
+  const ctx = document.getElementById("chartEmprunts");
+  if (!ctx) return;
+  const emprunts = JSON.parse(localStorage.getItem("emprunts") || "[]");
+  const months = lastNMonths(6);
+  const data = months.map(m => emprunts.filter(e => (e.date || "").startsWith(m)).length);
+  charts.push(new Chart(ctx, {
+    type: "bar",
+    data: { labels: months, datasets: [{ label: "Emprunts", data, backgroundColor: "#f39c12" }] },
+    options: { responsive: true, maintainAspectRatio: false }
+  }));
+}
+
+/* Chart 5: Categories pie */
+function renderChartCategoriesPie() {
+  const ctx = document.getElementById("chartCategories");
+  if (!ctx) return;
+  const categories = JSON.parse(localStorage.getItem("categories") || "[]").map(c => c.nom);
+  const livres = JSON.parse(localStorage.getItem("livres") || "[]");
+  const data = categories.map(cat => livres.filter(l => l.categorie === cat).length);
+  charts.push(new Chart(ctx, {
+    type: "pie",
+    data: { labels: categories, datasets: [{ data, backgroundColor: generateColors(categories.length) }] },
+    options: { responsive: true, maintainAspectRatio: false }
+  }));
+}
+
+/* Helpers for charts */
+function generateColors(n) {
+  const palette = ['#e74c3c','#2ecc71','#3498db','#9b59b6','#f1c40f','#e67e22','#1abc9c','#34495e'];
+  const out = [];
+  for (let i = 0; i < n; i++) out.push(palette[i % palette.length]);
+  return out;
+}
+
+function lastNMonths(n) {
+  const res = [];
+  const d = new Date();
+  for (let i = n - 1; i >= 0; i--) {
+    const dt = new Date(d.getFullYear(), d.getMonth() - i, 1);
+    res.push(dt.toISOString().slice(0, 7)); // YYYY-MM
+  }
+  return res;
+}
+
+
+
+
 
 /* ================= GLOBAL SEARCH EVENTS ================= */
 globalSearchBtn.addEventListener("click", ()=>{
@@ -313,4 +455,5 @@ globalSearchInput.addEventListener("keyup",(e)=>{
 window.onload = ()=>{
   document.getElementById("mySidebar").style.width="0";
   renderAll();
+  changeLanguage();
 };
