@@ -48,9 +48,9 @@
     <div class="nav-right">
       <!-- Language selector -->
       <select id="lang" onchange="changeLanguage()">
-        <option value="fr">🇫🇷 Français</option>
-        <option value="en">🇬🇧 English</option>
-        <option value="ar">🇸🇦 العربية</option>
+        <option value="fr">FR </option>
+        <option value="en">EN </option>
+        <option value="ar">AR </option>
       </select>
     </div>
   </nav>
@@ -58,14 +58,14 @@
   <!-- Sidebar -->
   <div id="mySidebar" class="sidebar">
     <a href="javascript:void(0)" class="closebtn" onclick="toggleSidebar()">×</a>
-    <h2 style="padding-left:20px;color:#251f17;">Bibliothèque</h2>
-    <a href="#" onclick="showSection('dashboard')">Dashboard</a>
-    <a href="#" onclick="showSection('livres')">Livres</a>
-    <a href="#" onclick="showSection('auteurs')">Auteurs</a>
-    <a href="#" onclick="showSection('adherents')">Adhérents</a>
-    <a href="#" onclick="showSection('emprunts')">Emprunts</a>
-    <a href="#" onclick="showSection('categories')">Catégories</a>
-    <a href="#" onclick="logout()">Déconnexion</a>
+    <h2 id="title-biblio" style="padding-left:20px;color:#251f17;">Bibliothèque</h2>
+    <a href="#" id="title-dashboard" onclick="showSection('dashboard')">Accueil</a>
+    <a href="#" id="title-livres" onclick="showSection('livres')">Livres</a>
+    <a href="#" id="title-auteurs" onclick="showSection('auteurs')">Auteurs</a>
+    <a href="#" id="title-adherents" onclick="showSection('adherents')">Adhérents</a>
+    <a href="#" id="title-emprunts" onclick="showSection('emprunts')">Emprunts</a>
+    <a href="#" id="title-categories" onclick="showSection('categories')">Catégories</a>
+    <a href="#" id="deconexion" onclick="logout()">Déconnexion</a>
   </div>
 
   <!-- Search Results -->
@@ -157,7 +157,3 @@
 <script src="script.js"></script>
 </body>
 </html>
-<script src="script.js"></script>
-</body>
-</html>
-
