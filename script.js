@@ -33,10 +33,60 @@ const fields = {
 
 /* ================= TRANSLATIONS ================= */
 const translations = {
-  fr: { dashboard:"Tableau de Bord", livres:"Livres", auteurs:"Auteurs", adherents:"Adhérents", emprunts:"Emprunts", categories:"Catégories" },
-  en: { dashboard:"Dashboard", livres:"Books", auteurs:"Authors", adherents:"Members", emprunts:"Loans", categories:"Categories" },
-  ar: { dashboard:"لوحة التحكم", livres:"الكتب", auteurs:"المؤلفون", adherents:"الأعضاء", emprunts:"الإعارات", categories:"الفئات" }
+  fr: {
+    bibliotheque:"Bibliothèque",
+    dashboard:"",
+    livres:"Livres",
+    auteurs:"Auteurs",
+    adherents:"Adhérents",
+    emprunts:"Emprunts",
+    categories:"Catégories",
+    logout:"Déconnexion",
+    rechercher:"Rechercher"
+  },
+  en: {
+    bibliotheque:"Library",
+    dashboard:"Dashboard",
+    livres:"Books",
+    auteurs:"Authors",
+    adherents:"Members",
+    emprunts:"Loans",
+    categories:"Categories",
+    logout:"Logout",
+    rechercher:"Search"
+  },
+  ar: {
+    bibliotheque:"المكتبة",
+    dashboard:"لوحة التحكم",
+    livres:"الكتب",
+    auteurs:"المؤلفون",
+    adherents:"الأعضاء",
+    emprunts:"الإعارات",
+    categories:"الفئات",
+    logout:"تسجيل الخروج",
+    rechercher:"بحث"
+  }
 };
+
+/* ================= LANGUAGE ================= */
+function changeLanguage(){
+  const lang = document.getElementById("lang").value;
+  localStorage.setItem("lang", lang);   
+  document.body.dir = lang==="ar" ? "rtl" : "ltr";
+
+  document.getElementById("title-biblio").textContent = translations[lang].bibliotheque;
+  document.getElementById("title-dashboard").textContent = translations[lang].dashboard;
+  document.getElementById("title-livres").textContent = translations[lang].livres;
+  document.getElementById("title-auteurs").textContent = translations[lang].auteurs;
+  document.getElementById("title-adherents").textContent = translations[lang].adherents;
+  document.getElementById("title-emprunts").textContent = translations[lang].emprunts;
+  document.getElementById("title-categories").textContent = translations[lang].categories;
+  document.getElementById("deconexion").textContent = translations[lang].logout;
+  document.getElementById("global-search-btn").textContent = translations[lang].rechercher;
+}
+
+
+
 
 /* ================= CHARTS ================= */
 let charts = [];
@@ -124,10 +174,44 @@ function logout(){
 
 /* ================= STORAGE INIT ================= */
 function initStorage(){
-  keys.forEach(k=>{ if(!localStorage.getItem(k)) localStorage.setItem(k, JSON.stringify([])); });
+
+  if(!localStorage.getItem("livres")){
+    localStorage.setItem("livres", JSON.stringify([
+      { titre:"1984", auteur:"George Orwell", categorie:"Roman" },
+      { titre:"Le Petit Prince", auteur:"Antoine de Saint-Exupéry", categorie:"Conte" }
+    ]));
+  }
+
+  if(!localStorage.getItem("auteurs")){
+    localStorage.setItem("auteurs", JSON.stringify([
+      { nom:"George Orwell", prenom:"" },
+      { nom:"Antoine de Saint-Exupéry", prenom:"" }
+    ]));
+  }
+
+  if(!localStorage.getItem("categories")){
+    localStorage.setItem("categories", JSON.stringify([
+      { nom:"Roman" },
+      { nom:"Conte" }
+    ]));
+  }
+
+  if(!localStorage.getItem("adherents")){
+    localStorage.setItem("adherents", JSON.stringify([
+      { nom:"Ahmed", email:"ahmed@mail.com", inscriptionDate:"2024-01-10" }
+    ]));
+  }
+
+  if(!localStorage.getItem("emprunts")){
+    localStorage.setItem("emprunts", JSON.stringify([
+      { livre:"1984", adherent:"Ahmed", date:"2024-01-15" }
+    ]));
+  }
+
   keys.forEach(renderList);
   updateDashboard();
 }
+
 
 /* ================= SIDEBAR ================= */
 function toggleSidebar(){
@@ -136,10 +220,13 @@ function toggleSidebar(){
 }
 
 function showSection(id){
-  document.querySelectorAll("main section").forEach(s=>s.style.display="none");
-  document.getElementById(id).style.display="block";
-  toggleSidebar();
+  document.querySelectorAll("main section").forEach(s => s.style.display = "none");
+  document.getElementById(id).style.display = "block";
+
+  const s = document.getElementById("mySidebar");
+  if(s.style.width === "250px") s.style.width = "0";
 }
+
 
 /* ================= CRUD ================= */
 let currentEntity = null;
@@ -164,18 +251,30 @@ function closeForm(){
   entityForm.reset();
 }
 
-entityForm.onsubmit = e=>{
+entityForm.onsubmit = e => {
   e.preventDefault();
-  const arr = JSON.parse(localStorage.getItem(currentEntity));
+
   const obj = {};
-  [...e.target.elements].forEach(el=>el.name&&(obj[el.name]=el.value));
-  editIndex!==null ? arr[editIndex]=obj : arr.push(obj);
+  [...e.target.elements].forEach(el => {
+    if(el.name) obj[el.name] = el.value.trim();
+  });
+
+  // VALIDATION AVANT TOUT
+  if(Object.values(obj).some(v => v === "")){
+    alert("Tous les champs sont obligatoires");
+    return;
+  }
+
+  const arr = JSON.parse(localStorage.getItem(currentEntity));
+  editIndex !== null ? arr[editIndex] = obj : arr.push(obj);
   localStorage.setItem(currentEntity, JSON.stringify(arr));
+
   closeForm();
   renderList(currentEntity);
   updateDashboard();
-  renderAllCharts(); // update charts
+  renderAllCharts();
 };
+
 
 /* ================= RENDER LIST ================= */
 function renderList(entity){
@@ -295,7 +394,7 @@ function filterGlobal(){
   const q = globalSearchInput.value.toLowerCase();
   keys.forEach(k=>{
     const arr = JSON.parse(localStorage.getItem(k));
-    const filtered = arr.filter(item=>Object.values(item).some(v=>v.toLowerCase().includes(q)));
+    const filtered = arr.filter(item =>Object.values(item).some(v =>String(v).toLowerCase().includes(q)));
     renderFilteredList(k, filtered);
     if(!q){
       renderList(k);
@@ -304,6 +403,7 @@ function filterGlobal(){
     }
   });
 }
+
 
 function renderFilteredList(entity, arr){
   const div = document.getElementById(entity+"-list");
@@ -343,19 +443,29 @@ async function exportPDF(entity){
   doc.save(entity+".pdf");
 }
 
-/* ================= LANGUAGE ================= */
-function changeLanguage(){
-  const lang = document.getElementById("lang").value;
-  document.body.dir = lang==="ar"?"rtl":"ltr";
-  document.getElementById("title-dashboard").textContent = translations[lang].dashboard;
-}
+
 
 /* ================= INIT ================= */
 window.onload = () => {
   document.getElementById("mySidebar").style.width = "0";
 
-  globalSearchBtn.addEventListener("click", () => { filterGlobal(); searchBooksAPI(); });
-  globalSearchInput.addEventListener("keyup", (e) => { if(e.key==="Enter"){ filterGlobal(); searchBooksAPI(); } });
+  const savedLang = localStorage.getItem("lang") || "fr";
+  document.getElementById("lang").value = savedLang;
 
-  renderAllCharts(); // render charts initially
+  initStorage();
+  renderAllCharts();
+  changeLanguage();   
+
+  globalSearchBtn.addEventListener("click", () => {
+    filterGlobal();
+    searchBooksAPI();
+  });
+
+  globalSearchInput.addEventListener("keyup", e => {
+    if(e.key === "Enter"){
+      filterGlobal();
+      searchBooksAPI();
+    }
+  });
 };
+
