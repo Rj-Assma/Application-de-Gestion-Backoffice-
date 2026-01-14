@@ -32,42 +32,47 @@
 <!-- ================= APP ================= -->
 <div id="app" class="hidden">
 
-  <!-- Menu button -->
-  <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
+  <!-- ================= NAVBAR ================= -->
+  <nav class="navbar">
+    <div class="nav-left">
+      <!-- Menu button -->
+      <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+    </div>
 
+    <div class="nav-center">
+      <!-- Global Search -->
+      <input type="text" id="global-search" placeholder="Search books...">
+      <button id="global-search-btn">Search</button>
+    </div>
+
+    <div class="nav-right">
+      <!-- Language selector -->
+      <select id="lang" onchange="changeLanguage()">
+        <option value="fr">🇫🇷 Français</option>
+        <option value="en">🇬🇧 English</option>
+        <option value="ar">🇸🇦 العربية</option>
+      </select>
+    </div>
+  </nav>
 
   <!-- Sidebar -->
   <div id="mySidebar" class="sidebar">
     <a href="javascript:void(0)" class="closebtn" onclick="toggleSidebar()">×</a>
     <h2 style="padding-left:20px;color:#251f17;">Bibliothèque</h2>
-    <a href="#" id="menu-dashboard" onclick="showSection('dashboard')">Dashboard</a>
-    <a href="#" id="menu-livres" onclick="showSection('livres')">Livres</a>
-    <a href="#" id="menu-auteurs" onclick="showSection('auteurs')">Auteurs</a>
-    <a href="#" id="menu-adherents" onclick="showSection('adherents')">Adhérents</a>
-    <a href="#" id="menu-emprunts" onclick="showSection('emprunts')">Emprunts</a>
-    <a href="#" id="menu-categories" onclick="showSection('categories')">Catégories</a>
+    <a href="#" onclick="showSection('dashboard')">Dashboard</a>
+    <a href="#" onclick="showSection('livres')">Livres</a>
+    <a href="#" onclick="showSection('auteurs')">Auteurs</a>
+    <a href="#" onclick="showSection('adherents')">Adhérents</a>
+    <a href="#" onclick="showSection('emprunts')">Emprunts</a>
+    <a href="#" onclick="showSection('categories')">Catégories</a>
     <a href="#" onclick="logout()">Déconnexion</a>
   </div>
 
-  <!-- Language selector -->
-  <header class="topbar" style="position:fixed;top:12px;right:20px;z-index:1002;">
-    <select id="lang" onchange="changeLanguage()">
-      <option value="fr">FR</option>
-      <option value="en">EN</option>
-      <option value="ar">AR</option>
-    </select>
-  </header>
+  <!-- Search Results -->
+  <div id="global-search-results" class="search-results hidden"></div>
 
   <!-- ================= MAIN ================= -->
   <main id="main-content">
-
-   <!-- ===== GLOBAL SEARCH BAR ===== -->
-<div class="search-container" style="margin-bottom:20px;">
-  <input type="text" id="global-search" placeholder="Rechercher dans toute la bibliothèque..." style="width: 50%; padding: 10px; border-radius: 8px; border: none; color: #333; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-  <button id="global-search-btn" style="background: #d7cec9;" >🔍</button>
-  <div id="global-search-results" style="margin-top:10px; "></div>
-</div>
-
 
     <!-- ===== DASHBOARD ===== -->
     <section id="dashboard">
@@ -152,3 +157,7 @@
 <script src="script.js"></script>
 </body>
 </html>
+<script src="script.js"></script>
+</body>
+</html>
+
